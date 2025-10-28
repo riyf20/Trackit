@@ -5,7 +5,7 @@ import { useThemeColor } from '@/hooks/use-theme-color';
 export type ThemedTextProps = TextProps & {
   lightColor?: string;
   darkColor?: string;
-  type?: 'default' | 'title' | 'defaultSemiBold' | 'subtitle' | 'link' | 'onboarding' | 'onboardingMain';
+  type?: 'default' | 'title' | 'defaultSemiBold' | 'subtitle' | 'link' | 'onboarding' | 'onboardingMain' | 'settingSubheading' | 'settingSuboptions';
 };
 
 export function ThemedText({
@@ -28,6 +28,8 @@ export function ThemedText({
         type === 'link' ? styles.link : undefined,
         type === 'onboarding' ? styles.onboarding : undefined,
         type === 'onboardingMain' ? styles.onboardingMain : undefined,
+        type === 'settingSubheading' ? styles.settingSubheading: undefined,
+        type === 'settingSuboptions' ? styles.settingSuboptions: undefined,
         style,
       ]}
       {...rest}
@@ -35,6 +37,8 @@ export function ThemedText({
   );
 }
 
+
+// Expanding off the Expo template | integrated custom version
 const styles = StyleSheet.create({
   default: {
     fontSize: 16,
@@ -59,6 +63,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#0a7ea4',
   },
+  // Custom versions
   onboarding: {
     fontSize: 18,
     fontWeight: 'bold',
@@ -66,5 +71,12 @@ const styles = StyleSheet.create({
   onboardingMain: {
     fontSize: 20,
     fontWeight: 'bold',
+  },
+  settingSubheading: {
+    fontSize: 24,
+    fontWeight: 'bold',
+  },
+  settingSuboptions: {
+    fontSize: 18,
   }
 });

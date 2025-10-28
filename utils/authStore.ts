@@ -4,18 +4,6 @@ import {getItem, setItem, deleteItemAsync} from "expo-secure-store"
 
 // This defines the states that will be saved
 type UserState = {
-    // token: string;
-    // user: User;
-    // username: string;
-    // refreshToken:string,
-
-    // isLoggedin: boolean;
-    // shouldCreateAccount: boolean;
-
-    // logIn: ({token, user, username, refreshToken}:logInProps) => void;
-    // logOut: () => void;
-    // setUsername: (username:string) => void;
-    // changeToken: (newToken:string) => void;
 
     loggedin: boolean;
     onboarding: boolean;
@@ -23,16 +11,21 @@ type UserState = {
     onboardingComplete: () => void;
     onboardingReset: () => void;
 
-    logIn: () => void;
+    logIn: ({username, password, email}:logInProps) => void;
     logOut: () => void;
+
+    username: string;
+    password: string;
+    email: string;
+    sessionID: string,
 }
 
-// type logInProps = {
-//     token:string, 
-//     user:User, 
-//     username:string,
-//     refreshToken:string,
-// }
+type logInProps = {
+    username: string;
+    password: string;
+    email: string;
+    sessionID: string,
+}
 
 // Export the hook, takes an arrow function that returns as object with each of the keys in our state
 // (defined above)
@@ -43,6 +36,10 @@ export const useAuthStore = create(
         <UserState>((set) => ({
             loggedin: false,
             onboarding: true,
+            username: "",
+            password: "",
+            email: "",
+            sessionID: "",
             onboardingComplete: () => {
                 set((state) => {
                     return {
@@ -61,12 +58,16 @@ export const useAuthStore = create(
                     }
                 })
             },
-            logIn: () => {
+            logIn: ({username, password, email, sessionID}:logInProps) => {
                 set((state) => {
                     return {
                         ...state,
                         loggedin: true,
                         onboarding: false,
+                        username: username, 
+                        password: password,
+                        email: email,
+                        sessionID: sessionID,
                     }
                 })
             },
@@ -76,6 +77,10 @@ export const useAuthStore = create(
                         ...state,
                         loggedin: false,
                         onboarding: false,
+                        username: "", 
+                        password: "",
+                        email: "",
+                        sessionID: "",
                     }
                 })
             },
