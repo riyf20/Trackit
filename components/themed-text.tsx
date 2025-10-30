@@ -5,7 +5,9 @@ import { useThemeColor } from '@/hooks/use-theme-color';
 export type ThemedTextProps = TextProps & {
   lightColor?: string;
   darkColor?: string;
-  type?: 'default' | 'title' | 'defaultSemiBold' | 'subtitle' | 'link' | 'onboarding' | 'onboardingMain' | 'settingSubheading' | 'settingSuboptions';
+  type?: 'default' | 'title' | 'defaultSemiBold' | 'subtitle' | 'link' | 
+  'onboarding' | 'onboardingMain' | 'settingSubheading' | 'settingSuboptions' 
+  | 'systemSettingOptions' | 'systemSettingSubtitle';
 };
 
 export function ThemedText({
@@ -30,6 +32,8 @@ export function ThemedText({
         type === 'onboardingMain' ? styles.onboardingMain : undefined,
         type === 'settingSubheading' ? styles.settingSubheading: undefined,
         type === 'settingSuboptions' ? styles.settingSuboptions: undefined,
+        type === 'systemSettingOptions' ? styles.systemSettingOptions: undefined,
+        type === 'systemSettingSubtitle' ? styles.systemSettingSubtitle: undefined,
         style,
       ]}
       {...rest}
@@ -38,7 +42,7 @@ export function ThemedText({
 }
 
 
-// Expanding off the Expo template | integrated custom version
+// Expanding off the Expo template | implemented custom version
 const styles = StyleSheet.create({
   default: {
     fontSize: 16,
@@ -63,6 +67,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#0a7ea4',
   },
+
   // Custom versions
   onboarding: {
     fontSize: 18,
@@ -78,5 +83,12 @@ const styles = StyleSheet.create({
   },
   settingSuboptions: {
     fontSize: 18,
+  },
+  systemSettingOptions: {
+    fontSize: 20,
+  },
+  systemSettingSubtitle: {
+    fontSize: 14,
+    fontWeight: 'light'
   }
 });

@@ -3,7 +3,7 @@ import onboarding2 from "@/assets/images/onboarding/onboarding2.png";
 import onboarding3 from "@/assets/images/onboarding/onboarding3.png";
 import logo from "@/assets/images/onboarding/logo.png";
 import background from "@/assets/images/onboarding/logo-background.jpg";
-
+import profile from '@/assets/images/account/pfp_blank.jpg'
 
 
 export const images = {
@@ -12,4 +12,5 @@ export const images = {
   onboarding3,
   logo,
   background,
+  profile
 };

@@ -10,8 +10,9 @@ import FormInput from '@/components/FormInput';
 import { useWindowDimensions } from 'react-native';
 import { checkUser,  } from '@/services/appwriteUsers';
 import { loginUser, createUser } from '@/services/appwriteAccount';
+import { useHapticFeedback as haptic} from '@/components/HapticTab';
 
-
+// Log/Sign up page
 const onboardingMain = () => {
 
   // Debug switch
@@ -429,6 +430,8 @@ const onboardingMain = () => {
           <Pressable
             className="bg-transparent border-2 border-white p-4 rounded-2xl items-center w-[50%]"
             onPress={() => {handleLogInView()}}
+            onPressIn={haptic()}
+            /* TO DO: add effect to the button being pressed */
           >
 
             <ThemedText type="onboarding" lightColor="white"> Log in </ThemedText>
@@ -482,7 +485,7 @@ const onboardingMain = () => {
 
               {/* TO DO: complete forgot password function */}
               {buttonText==='Log In' &&
-                <Pressable onPress={() => {console.log('forgot password function')}} className='self-end'>
+                <Pressable  onPressIn={haptic()} onPress={() => {console.log('forgot password function')}} className='self-end'>
                   <Text className='text-gray-400 underline'>Forgot your password?</Text> 
                 </Pressable>
               }
@@ -509,8 +512,8 @@ const onboardingMain = () => {
         
           <Pressable
             className="bg-[#16182C] p-4 rounded-2xl items-center w-[50%]"
+            onPressIn={haptic()}
             onPress={
-              
               buttonText==='Sign Up' && showForm===true ? () => {handleSignUp()} 
               : buttonText==='Sign Up' && showForm===false ? () => {handleShowForm()}
               : buttonText==='Log In' ? () => {handleLogIn()} 
@@ -532,7 +535,7 @@ const onboardingMain = () => {
               .delay(200)
             }
             className='absolute bottom-[-275px]'>
-            <ThemedText type='subtitle' lightColor='white'>Don't have an account? <Text className='underline font-bold' onPress={() => {handleShowForm()}}>Sign Up</Text></ThemedText>
+            <ThemedText type='subtitle' lightColor='white'>Don't have an account? <Text className='underline font-bold' onPressIn={haptic()} onPress={() => {handleShowForm()}}>Sign Up</Text></ThemedText>
           </Animated.View>
           :
           
@@ -542,7 +545,7 @@ const onboardingMain = () => {
               .delay(200)
             }
             className='absolute bottom-[-275px]'>
-            <ThemedText type='subtitle' lightColor='white'>Already have an account? <Text className='underline font-bold' onPress={() => {handleLogInView()}}>Log In</Text></ThemedText>
+            <ThemedText type='subtitle' lightColor='white'>Already have an account? <Text className='underline font-bold' onPressIn={haptic()} onPress={() => {handleLogInView()}}>Log In</Text></ThemedText>
           </Animated.View>
         )}
       </View>
