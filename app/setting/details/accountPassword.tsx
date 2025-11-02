@@ -9,31 +9,104 @@ import { FormControl, Input, InputField, FormControlError,
 import { router } from 'expo-router';
 import { useAuthStore } from '@/utils/authStore';
 import { useHapticFeedback as haptic} from '@/components/HapticTab';
+import { updateUserPassword } from '@/services/appwriteAccount';
+import AlertModal from '@/components/AlertModal';
 
 // Allows users to change password
 const accountPassword = () => {
 
   const theme = useThemeColor({}, 'text');
 
-  {/* TO DO: Remove password, this is only for testing */}
-  const {password} = useAuthStore();
+  const {password, updatePassword} = useAuthStore();
   
   // Error and validity state for the form 
   const [invalid, setInvalid] = useState(false);
   const [error, setError] = useState("");  
 
   // Value and validity state for current password 
-  const[previousPasswordInvalid, setPreviousPasswordInvalid] = useState(false);
-  const [previousPassword, setPreviousPassword] = useState(password);
+  const [previousPasswordInvalid, setPreviousPasswordInvalid] = useState(false);
+  const [previousPassword, setPreviousPassword] = useState('');
 
   // Value and validity state for new password
-  const[newPasswordInvalid, setNewPasswordInvalid] = useState(false);
+  const [newPasswordInvalid, setNewPasswordInvalid] = useState(false);
   const [newPassword, setNewPassword] = useState("");
 
   // Value and validity state for new password (user has to enter again)
-  const[confirmNewPasswordInvalid, setConfirmNewPasswordInvalid] = useState(false);
+  const [confirmNewPasswordInvalid, setConfirmNewPasswordInvalid] = useState(false);
   const [confirmNewPassword, setConfirmNewPassword] = useState("");
 
+  // Confirmation Modal
+  const [alertModal, setAlertModal] = useState(false);
+
+  const handleConfirm = async () => {
+    // Logic Checks
+    const requiredFields = [
+      { value: previousPassword, setInvalid: setPreviousPasswordInvalid },
+      { value: newPassword, setInvalid: setNewPasswordInvalid },
+      { value: confirmNewPassword, setInvalid: setConfirmNewPasswordInvalid },
+    ];
+
+    let hasEmptyField = false;
+
+    // Loops through all fields to check if empty --> show error if true
+    requiredFields.forEach(({ value, setInvalid }) => {
+      if (!value.trim()) {
+        setInvalid(true);
+        hasEmptyField = true;
+      }
+    });
+
+    // Makes sure all fields are entered
+    if (hasEmptyField) {
+      setInvalid(true);
+      setError("All fields are required.");
+      return;
+    }
+
+    if(previousPassword !== password) {
+      setInvalid(true);
+      setPreviousPasswordInvalid(true);
+      setError("Current password is incorrect.");
+      return;
+    }
+
+    if(newPassword !== confirmNewPassword) {
+      setInvalid(true);
+      setNewPasswordInvalid(true);
+      setConfirmNewPasswordInvalid(true);
+      setError("New password mismatch.");
+      return;
+    }
+
+    if(previousPassword === password && newPassword === password && confirmNewPassword === password) {
+      setAlertModal(true);
+    }
+
+    try {
+      const response = await updateUserPassword(previousPassword, newPassword);
+
+      updatePassword(newPassword);
+
+      setAlertModal(true);
+
+    } catch (error:any) {
+
+      if(error.code === 400 && error.message.includes('Invalid `password` param:')) {
+        setInvalid(true);
+        setNewPasswordInvalid(true);
+        setConfirmNewPasswordInvalid(true);
+        setError("Password must be 8-265 characters long.")
+      } else {
+        setInvalid(true);
+        setError("An unexpected error occured.")
+      }
+
+      console.log(error)
+      console.log(error.code)
+      console.log(error.message)
+    }
+
+  }
 
   return (
     <ThemedView className='flex-1'>
@@ -47,7 +120,7 @@ const accountPassword = () => {
             <FormControl className='flex gap-[20px]' isInvalid={invalid}>
 
               <View>
-                <ThemedText type='onboarding'>Previous Password</ThemedText>
+                <ThemedText type='onboarding'>Current Password</ThemedText>
                 <Input
                   variant='rounded' size='md' className='mt-[8px] bg-white/30 border-transparent'
                 >
@@ -106,17 +179,16 @@ const accountPassword = () => {
                   <Button variant='solid' action='negative' className='flex-1' onPressIn={haptic()} onPress={() => router.back()}>
                       <ButtonText>Cancel</ButtonText>
                   </Button>
-                  <Button action='positive' className='flex-1'>
+                  <Button action='positive' className='flex-1' onPressIn={haptic()} onPress={() => {handleConfirm()}}>
                       <ButtonText>Confirm</ButtonText>
                   </Button>  
               </View>
-
-              {/* TO DO: work on making confirm button connect to appwrite */}
               
           </View>
         </View>
 
       </View>
+      <AlertModal modalOpened={alertModal} confirmFunction={() => {router.back()}} setModalOpened={setAlertModal} />
     </ThemedView>
   )
 }

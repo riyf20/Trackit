@@ -12,12 +12,21 @@ const client = new sdk.Client()
     
 // Endpoint: Checks if user exists
 export const checkUser = async (userIdRequested: string) => {
+    
     const users = new sdk.Users(client);
 
-    const result = await users.get({
-        userId: userIdRequested
+    const allUsers = await users.list({
+        queries: [
+            sdk.Query.equal('name', userIdRequested),
+        ]
     });
 
-    // debug && console.log(result);
-    return result;
+    console.log(allUsers)
+
+    if(allUsers.total === 0) {
+        return(false)
+    } else {
+        return(true)
+    }
+
 }

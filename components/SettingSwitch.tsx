@@ -14,7 +14,7 @@ const SettingSwitch = ({title, index}:SettingSwitchProps) => {
     
   return (
     <>
-    <View className={`mt-[12px] w-full p-4 rounded-3xl flex flex-row items-center ${theme==='#ECEDEE' ? 'bg-white/20' : 'bg-black/20'} `}>
+    <View className={`mt-[12px] w-full p-4 rounded-3xl flex flex-row items-center ${theme==='#ECEDEE' ? 'bg-white/10' : 'bg-black/10'} `}>
         <ThemedText type='systemSettingOptions' className='ml-[12px] flex-1'>{title}</ThemedText>
             <Switch
               inactiveBgColor="#7d7d7d"

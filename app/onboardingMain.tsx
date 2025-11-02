@@ -8,9 +8,12 @@ import { useAuthStore } from '@/utils/authStore';
 import { AlertCircleIcon, FormControl, FormControlError, FormControlErrorIcon, FormControlErrorText } from '@gluestack-ui/themed';
 import FormInput from '@/components/FormInput';
 import { useWindowDimensions } from 'react-native';
-import { checkUser,  } from '@/services/appwriteUsers';
-import { loginUser, createUser } from '@/services/appwriteAccount';
+import { checkUser } from '@/services/appwriteUsers';
+import { loginUser, createUser, getUser } from '@/services/appwriteAccount';
 import { useHapticFeedback as haptic} from '@/components/HapticTab';
+import ForgotPasswordModal from '@/components/ForgotPasswordModal';
+import * as Haptics from 'expo-haptics';
+
 
 // Log/Sign up page
 const onboardingMain = () => {
@@ -64,7 +67,7 @@ const onboardingMain = () => {
   const [usernameInvalid, setUsernameInvalid] = useState(false)
   const [usernameValue, setUsernameValue] = useState('')
   const [passwordInvalid, setPasswordInvalid] = useState(false)
-  const [passwordValue, setPaswordValue] = useState('')
+  const [passwordValue, setPasswordValue] = useState('')
   const [emailInvalid, setEmailInvalid] = useState(false)
   const [emailValue, setEmailValue] = useState('')
 
@@ -73,6 +76,9 @@ const onboardingMain = () => {
 
   // Log in form view 
   const handleLogInView = () => {
+
+    setEmailValue("")
+    setPasswordValue("")
 
     // Clears form errors
     setFormInvalid(false)
@@ -103,6 +109,10 @@ const onboardingMain = () => {
 
   // Switchs between form views
   const handleShowForm = () => {
+
+    setUsernameValue("")
+    setEmailValue("")
+    setPasswordValue("")
 
     // Clears form errors
     setFormInvalid(false)
@@ -144,33 +154,6 @@ const onboardingMain = () => {
   // Log in or sign up text
   const [formTitle, setFormTitle] = useState('')
   const [formSubtitle, setFormSubtitle] = useState('')
-  
-  // Animation to keep input fields in view when keyboard enters
-  useEffect(() => {
-    // If keyboard is shown
-    const keyboardShow = Keyboard.addListener('keyboardWillShow', (e) => {
-
-      let moveUp = 0
-      console.log(buttonText);
-      if (buttonText==='Sign Up') {
-        // move slightly higher as there are 3 input fields 
-        moveUp = e.endCoordinates.height * 0.5; 
-      } else if (buttonText==='Log In') {
-        // move up enough to show input fields
-        moveUp = e.endCoordinates.height * 0.4; 
-      }
-      keyboardshift.value = withTiming(-moveUp, { duration: 300 });
-    });
-
-    const keyboardHide = Keyboard.addListener('keyboardWillHide', () => {
-      keyboardshift.value = withTiming(0, { duration: 300 });
-    });
- 
-    return () => {
-      keyboardShow.remove();
-      keyboardHide.remove();
-    };
-  }, [buttonText]);
 
   const handleSignUp = async () => {
 
@@ -180,17 +163,17 @@ const onboardingMain = () => {
       { value: usernameValue, setInvalid: setUsernameInvalid },
       { value: passwordValue, setInvalid: setPasswordInvalid },
     ];
-
+    
     let hasEmptyField = false;
-
+    
     // Loops through all fields to check if empty --> show error if true
     requiredFields.forEach(({ value, setInvalid }) => {
       if (!value.trim()) {
-          setInvalid(true);
-          hasEmptyField = true;
+        setInvalid(true);
+        hasEmptyField = true;
       }
     });
-
+    
     // Makes sure all fields are entered
     if (hasEmptyField) {
       setFormInvalid(true);
@@ -198,91 +181,77 @@ const onboardingMain = () => {
       signUpTranslateY.value = withTiming(150, { duration: 400 });
       return;
     }
-
+    
     // Will attempt sign up
-    try {
 
-      const response = await checkUser(usernameValue);
+    const response = await checkUser(usernameValue);
 
-      // If no error this username already exists
+    if(response) {
+      
+      // If response is true --> username already exists
       setFormInvalid(true);
       setUsernameInvalid(true);
       signUpTranslateY.value = withTiming(150, { duration: 400 });
       setError("This username already existed.");
-
-    } catch (error:any) {
-
-      if(error.code === 404 && error.message.includes('ID could not be found.')) {
+    } else {
         
-        // Username is not take --> create the new user
+      // Username is not taken --> create the new user
+      try {
+        const response = await createUser(emailValue, passwordValue, usernameValue);
+
+        // Successfully created new user --> log in and create session
         try {
-          const response = await createUser(emailValue, passwordValue, usernameValue);
 
-          // Successfully created new user --> log in and create session
-          try {
+          const responseLogin = await loginUser(emailValue, passwordValue);
 
-            const responseLogin = await loginUser(emailValue, passwordValue);
-
-            // Save all data to device storage and login
-            logIn({
-              username:usernameValue,
-              password:passwordValue,
-              email:emailValue,
-              sessionID: responseLogin.$id,
-            });
-            
-          } catch (error:any) {
-            setFormInvalid(true);
-            signUpTranslateY.value = withTiming(150, { duration: 400 });
-            setError("An unexpected error occured.");
-          }
-
-        
-        } catch (errorCreate:any) {
-
-          // Catches invalid email
-          if(errorCreate.code === 400 && errorCreate.message.includes('Invalid `email` param:')) {
-            setFormInvalid(true);
-            setEmailInvalid(true);
-            signUpTranslateY.value = withTiming(150, { duration: 400 });
-            setError("Please enter a valid email address.")
-
-            // Catches invalid password
-          } else if(errorCreate.code === 400 && errorCreate.message.includes('Invalid `password` param')) {
-            setFormInvalid(true);
-            setEmailInvalid(true);
-            signUpTranslateY.value = withTiming(150, { duration: 400 });
-            setError("Password must be 8-265 characters long.")
-
-          } else {
-            // Will catch other errors as well
-            setFormInvalid(true);
-            signUpTranslateY.value = withTiming(150, { duration: 400 });
-
-            debug && console.log("error creating user");
-            debug && console.log(errorCreate);
-            debug && console.log(errorCreate.code);
-            debug && console.log(errorCreate.message);
-
-            setError("An unexpected error occured.");
-          }
-
+          // Save all data to device storage and login
+          logIn({
+            userId:usernameValue,
+            username:usernameValue,
+            password:passwordValue,
+            email:emailValue,
+            sessionID: responseLogin.$id,
+          });
           
+        } catch (error:any) {
+          setFormInvalid(true);
+          signUpTranslateY.value = withTiming(150, { duration: 400 });
+          setError("An unexpected error occured.");
         }
 
-      } else {
-        // Other types of error
-        setFormInvalid(true);
-        signUpTranslateY.value = withTiming(150, { duration: 400 });
-        
-        debug && console.log("Error checking if userid exists during sign up");
-        debug && console.log(error.message);
-        
-        setError("An unexpected error occured.");
+      
+      } catch (errorCreate:any) {
+
+        // Catches invalid email
+        if(errorCreate.code === 400 && errorCreate.message.includes('Invalid `email` param:')) {
+          setFormInvalid(true);
+          setEmailInvalid(true);
+          signUpTranslateY.value = withTiming(150, { duration: 400 });
+          setError("Please enter a valid email address.")
+
+          // Catches invalid password
+        } else if(errorCreate.code === 400 && errorCreate.message.includes('Invalid `password` param')) {
+          setFormInvalid(true);
+          setEmailInvalid(true);
+          signUpTranslateY.value = withTiming(150, { duration: 400 });
+          setError("Password must be 8-265 characters long.")
+
+        } else {
+          // Will catch other errors as well
+          setFormInvalid(true);
+          signUpTranslateY.value = withTiming(150, { duration: 400 });
+
+          debug && console.log("error creating user");
+          debug && console.log(errorCreate);
+          debug && console.log(errorCreate.code);
+          debug && console.log(errorCreate.message);
+
+          setError("An unexpected error occured.");
+        }
+ 
       }
 
     }
-
 
   }
 
@@ -290,7 +259,7 @@ const onboardingMain = () => {
 
     // Logic Checks
     const requiredFields = [
-      { value: usernameValue, setInvalid: setUsernameInvalid },
+      { value: emailValue, setInvalid: setEmailInvalid },
       { value: passwordValue, setInvalid: setPasswordInvalid },
     ];
 
@@ -313,57 +282,36 @@ const onboardingMain = () => {
     }
 
     try {
-      // Check to see if the user exists
-      const userResponse = await checkUser(usernameValue);
+      // If user is found then login using email and password
+      const userLoginResponse = await loginUser(emailValue, passwordValue);
+      const userResponse = await getUser(userLoginResponse.$id);
 
-      try {
-        // If user is found then login using email and password
-        const userLoginResponse = await loginUser(userResponse.email, passwordValue);
+      // debug && console.log(userLoginResponse);
+      // debug && console.log(userLoginResponse.$id);
 
-        debug && console.log(userLoginResponse);
-        debug && console.log(userLoginResponse.$id);
+      // Store all user data on device
+      logIn({
+        password: passwordValue,
+        email: emailValue,
+        sessionID: userLoginResponse.$id,
+        userId: userLoginResponse.userId,
+        username: userResponse.name,
+      })
+  
+    } catch (errorUserLogin:any) {
 
-        // Store all user data on device
-        logIn({
-          username: usernameValue,
-          password: passwordValue,
-          email: userResponse.email,
-          sessionID: userLoginResponse.$id,
-        })
-    
-      } catch (errorUserLogin:any) {
-
-        // Catches error in username/password 
-        setFormInvalid(true);
-        setUsernameInvalid(true);
-        setPasswordInvalid(true);
-        signUpTranslateY.value = withTiming(120, { duration: 400 });
-        setError("Please check username and password.");
-
-        debug && console.log(errorUserLogin)
-        debug && console.log(errorUserLogin.code)
-        debug && console.log(errorUserLogin.message)
-      }
-      
-    } catch (errorUser:any) {
-
-      // Catches if user id could not be found
+      // Catches error in username/password 
       setFormInvalid(true);
       setUsernameInvalid(true);
       setPasswordInvalid(true);
       signUpTranslateY.value = withTiming(120, { duration: 400 });
+      setError("Please check username and password.");
 
-      if(errorUser.code === 404 && errorUser.message.includes("ID could not be found")) {
-        setError("Please check username and password.");
-      } else {
-        setError("An unexpected error occured.")
-      }
-      
-      // debug && console.log(errorUser)
-      // debug && console.log(errorUser.code)
-      // debug && console.log(errorUser.message)
+      debug && console.log(errorUserLogin)
+      debug && console.log(errorUserLogin.code)
+      debug && console.log(errorUserLogin.message)
     }
-
+      
   }
 
   // Moves main button up after user types (typing clears error message --> resets view)
@@ -379,7 +327,47 @@ const onboardingMain = () => {
     }
   }, [formInvalid])
   
-  
+  const [clearButton, setClearButton] = useState(false);
+  const [fullButton, setFullButton] = useState(false);
+
+  const handleButton = (type:String) => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    if(type==="clear"){
+      setClearButton(true);
+    } else if(type==="full"){
+      setFullButton(true);
+    }
+  }
+
+  const [forgotPasswordShowModal, setForgotPasswordShowModal] = useState(false);
+
+  // Animation to keep input fields in view when keyboard enters
+  useEffect(() => {
+
+    // if(forgotPasswordShowModal) {
+      // If keyboard is shown
+      const keyboardShow = Keyboard.addListener('keyboardWillShow', (e) => {
+
+        let moveUp = 0
+        if (buttonText==='Sign Up') {
+          // move slightly higher as there are 3 input fields 
+          moveUp = e.endCoordinates.height * 0.5; 
+        } else if (buttonText==='Log In') {
+          // move up enough to show input fields
+          moveUp = e.endCoordinates.height * 0.4; 
+        }
+        keyboardshift.value = withTiming(-moveUp, { duration: 300 });
+      });
+
+      const keyboardHide = Keyboard.addListener('keyboardWillHide', () => {
+        keyboardshift.value = withTiming(0, { duration: 300 });
+      });
+      return () => {
+        keyboardShow.remove();
+        keyboardHide.remove();
+      };
+    // }
+  }, [buttonText]);
 
   return (
     <ImageBackground
@@ -428,13 +416,13 @@ const onboardingMain = () => {
         <Animated.View style={signInStyle} className={'w-full flex items-center'}>
           
           <Pressable
-            className="bg-transparent border-2 border-white p-4 rounded-2xl items-center w-[50%]"
+            key={"clearButton"}
+            className={`border-white p-4 rounded-2xl items-center bg-transparent w-[50%] border-2 ${clearButton && 'bg-slate-500 w-[48%] border-[1px] '}`}
             onPress={() => {handleLogInView()}}
-            onPressIn={haptic()}
-            /* TO DO: add effect to the button being pressed */
+            onPressIn={() => {handleButton("clear")}}
+            onPressOut={() => {setClearButton(false)}}
           >
-
-            <ThemedText type="onboarding" lightColor="white"> Log in </ThemedText>
+            <ThemedText type="onboarding" lightColor="white" className={` scale-100 ${clearButton && 'scale-90'}`}> Log in </ThemedText>
           </Pressable>
         </Animated.View>
 
@@ -460,7 +448,7 @@ const onboardingMain = () => {
                     FadeIn.duration(400)
                   }
                 >
-                  <FormInput invalid={emailInvalid} placeholder='Email' value={emailValue} parentInvalid={formInvalid} setValue={setEmailValue} setValueInvalid={setEmailInvalid} setParentInvalid={setFormInvalid} error={error} />
+                  <FormInput invalid={usernameInvalid} placeholder='Username' value={usernameValue} parentInvalid={formInvalid} setValue={setUsernameValue} setValueInvalid={setUsernameInvalid} setParentInvalid={setFormInvalid} error={error} /> 
                 </Animated.View>
                 )
               }
@@ -471,7 +459,7 @@ const onboardingMain = () => {
                   .reduceMotion(ReduceMotion.Never)
                 }
               >
-                <FormInput invalid={usernameInvalid} placeholder='Username' value={usernameValue} parentInvalid={formInvalid} setValue={setUsernameValue} setValueInvalid={setUsernameInvalid} setParentInvalid={setFormInvalid} error={error} /> 
+                <FormInput invalid={emailInvalid} placeholder='Email' value={emailValue} parentInvalid={formInvalid} setValue={setEmailValue} setValueInvalid={setEmailInvalid} setParentInvalid={setFormInvalid} error={error} />
               </Animated.View>
 
               <Animated.View
@@ -480,15 +468,15 @@ const onboardingMain = () => {
                   .reduceMotion(ReduceMotion.Never)
                 }
               >
-                <FormInput invalid={passwordInvalid} placeholder='Password' value={passwordValue} parentInvalid={formInvalid} setValue={setPaswordValue} setValueInvalid={setPasswordInvalid} setParentInvalid={setFormInvalid} error={error} />
+                <FormInput invalid={passwordInvalid} placeholder='Password' value={passwordValue} parentInvalid={formInvalid} setValue={setPasswordValue} setValueInvalid={setPasswordInvalid} setParentInvalid={setFormInvalid} error={error} />
               </Animated.View>
 
-              {/* TO DO: complete forgot password function */}
-              {buttonText==='Log In' &&
-                <Pressable  onPressIn={haptic()} onPress={() => {console.log('forgot password function')}} className='self-end'>
+              {/* TO DO: complete forgot password function [need to link email provider]*/}
+              {/* {buttonText==='Log In' &&
+                <Pressable  onPressIn={haptic()} onPress={() => {setForgotPasswordShowModal(true)}} className='self-end'>
                   <Text className='text-gray-400 underline'>Forgot your password?</Text> 
                 </Pressable>
-              }
+              } */}
 
               {formInvalid &&
                 <View className={`${buttonText==='Log In' ? 'mt-[20px]' : 'mt-[4px]'} `}>
@@ -511,8 +499,10 @@ const onboardingMain = () => {
         <Animated.View style={signUpStyle} className={'w-full flex items-center'}>
         
           <Pressable
-            className="bg-[#16182C] p-4 rounded-2xl items-center w-[50%]"
-            onPressIn={haptic()}
+            key={"fullButton"}
+            className={`p-4 rounded-2xl items-center bg-[#16182C] w-[50%] ${fullButton && 'bg-[#212241] w-[48%]'}`}
+            onPressIn={() => {handleButton("full")}} 
+            onPressOut={() => {setFullButton(false)}} 
             onPress={
               buttonText==='Sign Up' && showForm===true ? () => {handleSignUp()} 
               : buttonText==='Sign Up' && showForm===false ? () => {handleShowForm()}
@@ -521,7 +511,7 @@ const onboardingMain = () => {
             }
           >
             <Animated.View style={buttonTextStyle}>
-              <ThemedText type="onboarding" lightColor="white">{buttonText}</ThemedText>
+              <ThemedText type="onboarding" lightColor="white" className={` scale-100 ${fullButton && 'scale-90'}`} >{buttonText}</ThemedText>
             </Animated.View>
           </Pressable>
         </Animated.View> 
@@ -552,6 +542,7 @@ const onboardingMain = () => {
 
     </View>
     </Animated.View>
+    <ForgotPasswordModal forgotPasswordShowModal={forgotPasswordShowModal} setForgotPasswordShowModal={setForgotPasswordShowModal} />
     </ImageBackground>
   )
 }

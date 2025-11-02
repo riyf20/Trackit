@@ -11,17 +11,23 @@ type UserState = {
     onboardingComplete: () => void;
     onboardingReset: () => void;
 
-    logIn: ({username, password, email}:logInProps) => void;
+    logIn: ({userId, username, password, email, sessionID}:logInProps) => void;
     logOut: () => void;
 
-    username: string;
+    userId: string; //appwrite userid
+    username:string; //appwrite username 
     password: string;
     email: string;
     sessionID: string,
+
+    updateEmail: (newEmail:string) => void;
+    updateUsername: (newUsername:string) => void;
+    updatePassword: (newPassword:string) => void;
 }
 
 type logInProps = {
-    username: string;
+    userId: string;
+    username:string;
     password: string;
     email: string;
     sessionID: string,
@@ -36,7 +42,9 @@ export const useAuthStore = create(
         <UserState>((set) => ({
             loggedin: false,
             onboarding: true,
+            userId: "",
             username: "",
+            displayName: "",
             password: "",
             email: "",
             sessionID: "",
@@ -58,13 +66,14 @@ export const useAuthStore = create(
                     }
                 })
             },
-            logIn: ({username, password, email, sessionID}:logInProps) => {
+            logIn: ({userId, username, password, email, sessionID}:logInProps) => {
                 set((state) => {
                     return {
                         ...state,
                         loggedin: true,
                         onboarding: false,
-                        username: username, 
+                        userId: userId, 
+                        username: username,
                         password: password,
                         email: email,
                         sessionID: sessionID,
@@ -77,12 +86,37 @@ export const useAuthStore = create(
                         ...state,
                         loggedin: false,
                         onboarding: false,
+                        userId: "",
                         username: "", 
                         password: "",
                         email: "",
                         sessionID: "",
                     }
                 })
+            },
+            updateEmail(newEmail:string) {
+                set((state) => {
+                    return {
+                        ...state,
+                        email: newEmail,
+                    }
+                }) 
+            },
+            updateUsername(newUsername:string) {
+                set((state) => {
+                    return {
+                        ...state,
+                        username: newUsername,
+                    }
+                }) 
+            },
+            updatePassword(newPassword:string) {
+                set((state) => {
+                    return {
+                        ...state,
+                        password: newPassword,
+                    }
+                }) 
             },
         }),
    

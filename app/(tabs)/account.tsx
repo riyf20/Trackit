@@ -1,4 +1,4 @@
-import { View, Pressable, ScrollView } from 'react-native'
+import { View, Pressable, ScrollView, Platform } from 'react-native'
 import React, { useState } from 'react'
 import { ThemedView } from '@/components/themed-view'
 import { ThemedText } from '@/components/themed-text'
@@ -10,9 +10,15 @@ import { details, detailsRoutes, social, socialRoutes,
   progress, progressRoutes } from '@/constants/settings'
 import { GlassView } from 'expo-glass-effect'
 import * as Haptics from 'expo-haptics';
+import { BlurView } from 'expo-blur'
 
 // [Account tab] - User settings page
 const account = () => {
+
+  // Used to check if glass view (ios 26) can be used
+  const iosVersion = Platform.Version;
+  const iosVersionNumber = typeof iosVersion === 'string' ? parseInt(iosVersion, 10) : iosVersion;
+  const [useGlass, setUseGlass] = useState(typeof iosVersionNumber === 'number' && iosVersionNumber >= 26);
 
   // Debug switch
   const debug = false;
@@ -101,34 +107,50 @@ const account = () => {
 
 
       {/* Account header with more settings button (placed at bottom so scrollview renders and can be view beneath blurview) */}
-      <GlassView 
-        // Blur view settings | may switch back later on depending on efficiency
-        // intensity={30} 
-        // tintColor={`${theme==='#ECEDEE' ? 'dark' : 'light'}`}
-        // className='h-[13%] absolute top-0 left-0 w-full flex justify-center rounded-b-3xl'
-        style={{
-          height: '13%',
-          position: 'absolute',
-          top: 0,
-          left: 0,
-          width: '100%',
-          justifyContent: 'center',
-          borderBottomLeftRadius: 10,
-          borderBottomRightRadius: 10,
-        }}
-      >
-        <ThemedText type='title' className='items-left justify-start absolute ml-[30px] mt-[75px]'>Account</ThemedText>
-        
-        <View className={`items-right justify-end absolute top-[74px] right-0 mr-[30px] border-2 border-transparent rounded-full p-[3px] ${iconPressed ? (theme==='#ECEDEE' ? 'bg-white/20' : 'bg-black/20') : 'bg-transparent' } `}>
-          <Pressable
-            onPressIn={handleIconPressed}
-            onPressOut={() => {setIconPressed(false)}}
-            onPress={() => {router.push('/setting/systemSetting')}}
-          >
-            <IconSymbol name='gear' size={35} color={theme}/>
-          </Pressable>
-        </View> 
-      </GlassView>
+      {useGlass ? 
+        <GlassView 
+          style={{
+            height: '13%',
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            width: '100%',
+            justifyContent: 'center',
+            borderBottomLeftRadius: 10,
+            borderBottomRightRadius: 10,
+          }}
+        >
+          <ThemedText type='title' className='items-left justify-start absolute ml-[30px] mt-[75px]'>Account</ThemedText>
+          
+          <View className={`items-right justify-end absolute top-[74px] right-0 mr-[30px] border-2 border-transparent rounded-full p-[3px] ${iconPressed ? (theme==='#ECEDEE' ? 'bg-white/20' : 'bg-black/20') : 'bg-transparent' } `}>
+            <Pressable
+              onPressIn={handleIconPressed}
+              onPressOut={() => {setIconPressed(false)}}
+              onPress={() => {router.push('/setting/systemSetting')}}
+            >
+              <IconSymbol name='gear' size={35} color={theme}/>
+            </Pressable>
+          </View> 
+        </GlassView>
+        :
+        <BlurView
+          intensity={30} 
+          tint={`${theme==='#ECEDEE' ? 'dark' : 'light'}`}
+          className='h-[13%] absolute top-0 left-0 w-full flex justify-center rounded-b-3xl'
+        >
+          <ThemedText type='title' className='items-left justify-start absolute ml-[30px] mt-[75px]'>Account</ThemedText>
+          
+          <View className={`items-right justify-end absolute top-[74px] right-0 mr-[30px] border-2 border-transparent rounded-full p-[3px] ${iconPressed ? (theme==='#ECEDEE' ? 'bg-white/20' : 'bg-black/20') : 'bg-transparent' } `}>
+            <Pressable
+              onPressIn={handleIconPressed}
+              onPressOut={() => {setIconPressed(false)}}
+              onPress={() => {router.push('/setting/systemSetting')}}
+            >
+              <IconSymbol name='gear' size={35} color={theme}/>
+            </Pressable>
+          </View> 
+        </BlurView>
+      }
 
     </ThemedView>
     

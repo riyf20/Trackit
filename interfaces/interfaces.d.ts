@@ -19,3 +19,14 @@ interface SettingCardProps {
     title: string,
     index: number,
 }
+
+interface ForgotPasswordModalProps {
+    forgotPasswordShowModal:boolean,
+    setForgotPasswordShowModal: (args0:boolean) => void,
+}
+
+interface alertModalProps {
+    modalOpened: boolean,
+    setModalOpened: (args0:boolean) => void,
+    confirmFunction: () => void;
+}

@@ -1,5 +1,5 @@
 import { View, Text, Pressable } from 'react-native'
-import React from 'react'
+import React, { useState } from 'react'
 import { systemSettingInformation } from '@/constants/settings'
 import { ThemedText } from './themed-text'
 import { IconSymbol } from './ui/icon-symbol'
@@ -9,11 +9,14 @@ import { useThemeColor } from '@/hooks/use-theme-color';
 const SettingCard = ({title, index}:SettingCardProps) => {
 
   const theme = useThemeColor({}, 'text');
+
+  const [pressed, setPressed] = useState(false);
   
   return (
     <>
-    {/* TO DO: add the press in effect to the pressable */}
-    <Pressable onPress={() => console.log("redirect to next page")} className={`mt-[12px] w-full p-4 rounded-3xl flex flex-row items-center ${theme==='#ECEDEE' ? 'bg-white/20' : 'bg-black/20'} `}>
+    <Pressable onPressIn={() => {setPressed(true)}} onPressOut={() => {setPressed(false)}} onPress={() => console.log("redirect to next page")} 
+    className={`mt-[12px] w-full p-4 rounded-3xl flex flex-row items-center ${theme==='#ECEDEE' ? `${pressed ? 'bg-white/20' : 'bg-white/10'}` : `${pressed ? 'bg-black/20' : 'bg-black/10'}`} `} 
+    >
       <ThemedText type='systemSettingOptions' className='ml-[12px] flex-1'>{title}</ThemedText>
       <View className='flex items-center'>
           <IconSymbol name='chevron.right' size={16} color={'gray'}/>
