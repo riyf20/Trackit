@@ -28,5 +28,42 @@ interface ForgotPasswordModalProps {
 interface alertModalProps {
     modalOpened: boolean,
     setModalOpened: (args0:boolean) => void,
-    confirmFunction: () => void;
+    confirmFunction: () => void,
+    isLoading: boolean,
 }
+
+interface BottomProps {
+    parent:string,
+    keyboard?: Boolean,
+    altered: boolean,
+    setAltered: (args0:boolean) => void,
+}
+
+interface BottomSheetHandle {
+    open: () => void;
+    commentUp: () => void;
+    commentDown: () => void;
+    close: () => void;
+}
+
+
+interface ImageUploaderProps {
+    setClose: () => void;
+    setAltered: (args0:boolean) => void,
+}
+
+interface ImageCardProps {
+    uri: string;
+    onPress: (args0: number) => void;
+    onLongPress: (args0: number) => void;
+    index: number;
+    parent: string;
+}
+
+// Can be used later...
+// interface ImageItem {
+//     filePath: string;
+//     fileUri: string;
+//     base64: string;
+//     id?:number
+// }

@@ -1,5 +1,5 @@
 import { View, Pressable, Image } from 'react-native'
-import React, { useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { ThemedView } from '@/components/themed-view'
 import { ThemedText } from '@/components/themed-text'
 import { IconSymbol } from '@/components/ui/icon-symbol'
@@ -13,12 +13,19 @@ import { useAuthStore } from '@/utils/authStore'
 import { useHapticFeedback as haptic} from '@/components/HapticTab';
 import { updateUserEmail, updateUserUsername } from '@/services/appwriteAccount'
 import AlertModal from '@/components/AlertModal'
+import Bottom from '@/components/Bottom'
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import * as Haptics from 'expo-haptics';
 
 // Allows users to change profile picture, username, and email
 const accountInformation = () => {
 
     const theme = useThemeColor({}, 'text');
-    const {username, email, password, updateEmail, updateUsername} = useAuthStore();
+
+    const {username, email, password, updateEmail, updateUsername, 
+        profilePictureFileId, profilePictureFileUrl, defaultPicture,
+        getDefaultPicture, getProfileFileId, getProfileFileUrl
+    } = useAuthStore();
 
     // Error and validity state for the form 
     const [invalid, setInvalid] = useState(false);
@@ -60,20 +67,22 @@ const accountInformation = () => {
         }
 
         if(emailInput===email && usernameInput===username) {
+            // If no changes were made but user hit save
+            // No need to make api call
             setAlertModal(true);
 
         } else {
 
+            // Email was changed
             if(emailInput!==email){
-                // Change Email
                 try {
 
+                    // Api call to change email
                     const response = await updateUserEmail(emailInput, password);
 
+                    // Saves the changes on device 
                     updateEmail(emailInput);
                     
-                    console.log("email changed");
-
                 } catch (error:any) {
 
                     if(error.code === 400 && error.message.includes('Invalid `email` param:')) {
@@ -91,16 +100,16 @@ const accountInformation = () => {
                 }
             }
 
+            // Username was changed
             if(usernameInput!==username) {
-                // Change Username
                 try {
 
+                    // Api call to change username
                     const response = await updateUserUsername(usernameInput);
 
+                    // Saves the changes on device 
                     updateUsername(usernameInput);
                     
-                    console.log("username changed");
-
                 } catch (error:any) {
 
                     if(error.code === 400 && error.message.includes('Invalid `username` param:')) {
@@ -122,89 +131,139 @@ const accountInformation = () => {
 
         }
     }
+
+    const bottomRef = useRef<BottomSheetHandle>(null);
+
+    const [pressed, setPressed] = useState(false);
+
+    const handlePressed = () => {
+        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+        setPressed(true)
+    }
+
+    const[url, setUrl] = useState<String | null>("")
+    const [basePicture, setBasePicture] = useState(true);
+    const [imageChanged, setImageChanged] = useState(false);
     
+    // Depending on any changes will change picture
+    useEffect(() => {
+        if(!defaultPicture) {
+        if(profilePictureFileId.trim() && profilePictureFileUrl.trim()) {
+            setUrl(profilePictureFileUrl)
+            setBasePicture(false);
+        } else {
+            setBasePicture(true);
+        }
+        } else {
+        setBasePicture(true);
+        }
+
+    }, [profilePictureFileId, profilePictureFileUrl, imageChanged])
+
+    useEffect(() => {
+        if(!getDefaultPicture() || imageChanged) {
+    
+            if(getProfileFileId().trim() && getProfileFileUrl().trim()) {
+            setUrl(getProfileFileUrl())
+            setBasePicture(false);
+            } else {
+            setBasePicture(true);
+            }
+
+            } else {
+            setBasePicture(true)
+        }
+    }, [imageChanged])
+
+
+
   return (
-    <ThemedView className='flex-1'>
-        
-        <View className='h-full flex items-center'>
+    <GestureHandlerRootView>
+        <ThemedView className='flex-1'>
+            
+            <View className='h-full flex items-center'>
 
-            <View className={` ${theme==='#ECEDEE' ? 'bg-white/20' : 'bg-black/30'} bg-gray-600 w-[90%] h-fit pb-[50px] mt-[12px] rounded-3xl items-center`} >
-                
-                {/* TO DO: Currently holds placeholder profile picture, allow for user inputted image */}
-                <Image
-                    source={images.profile}
-                    className='w-[100px] h-[100px] rounded-full self-center my-[20px]'
-                    resizeMode="cover"
-                />
-
-                <View className='mt-[12px] w-[86%]'>
-
-                    <FormControl className='flex gap-[20px]' isInvalid={invalid}>
-
-                        <View>
-                            <ThemedText type='onboarding'>Profile Picture</ThemedText>
-                            <Pressable className={`flex flex-row items-center mr-[6px] mt-[8px] bg-white p-2 rounded-3xl `}>
-                                <ThemedText className='w-[88%] ml-[12px]' darkColor='black'>Change Profile Picture</ThemedText>
-                                <IconSymbol name='chevron.right' size={16} color={theme}/>
-                            </Pressable>
-                        </View>
-
-                        <View>
-                            <ThemedText type='onboarding'>Username</ThemedText>
-                            <Input
-                                variant='rounded' size='md' className='mt-[8px] bg-white/30 border-transparent'
-                            >
-                                <InputField placeholder={usernameInput} value={usernameInput} className='bg-slate-50' 
-                                    onChangeText={(text) => {
-                                        setUsernameInput(text);
-                                        setUsernameInvalid(false);
-                                        setInvalid(false); 
-                                    }}
-                                />
-                            </Input>
-                        </View>
-
-                        <View>
-                            <ThemedText type='onboarding'>Email</ThemedText>
-                            <Input
-                                variant='rounded' size='md' className='mt-[8px] bg-white/30 border-transparent'
-                            >
-                                <InputField placeholder={emailInput} value={emailInput} className='bg-slate-50' 
-                                    onChangeText={(text) => {
-                                        setEmailInput(text);
-                                        setEmailInvalid(false);
-                                        setInvalid(false); 
-                                    }}
-                                />
-                            </Input>
-                        </View>
-
-                        <FormControlError
-                            className={`bg-red-300 rounded-3xl p-[2px] w-[96%] bottom-[10px] flex justify-center self-center`}
-                        >
-                            <FormControlErrorIcon as={AlertCircleIcon} />
-                            <FormControlErrorText>
-                                {error}
-                            </FormControlErrorText>
-                        </FormControlError>
-
-                    </FormControl>
-
-                    <View className='mt-[24px] flex flex-row gap-4'>
-                        <Button variant='solid' action='negative' className='flex-1' onPressIn={haptic()} onPress={() => router.back()}>
-                            <ButtonText>Cancel</ButtonText>
-                        </Button>
-                        <Button action='positive' className='flex-1' onPressIn={haptic()} onPress={() => handleConfirm()}>
-                            <ButtonText>Confirm</ButtonText>
-                        </Button>  
-                    </View>
+                <View className={` ${theme==='#ECEDEE' ? 'bg-white/20' : 'bg-black/30'} bg-gray-600 w-[90%] h-fit pb-[50px] mt-[12px] rounded-3xl items-center`} >
                     
-                </View>
-            </View>
+                    <Image
+                        source={basePicture ? images.profile : {uri: url}}
+                        className='w-[100px] h-[100px] rounded-full self-center my-[20px]'
+                        resizeMode="cover"
+                    />
 
-        </View>
-        <AlertModal modalOpened={alertModal} confirmFunction={() => {router.back()}} setModalOpened={setAlertModal} />
-    </ThemedView>
+                    <View className='mt-[12px] w-[86%]'>
+
+                        <FormControl className='flex gap-[20px]' isInvalid={invalid}>
+
+                            <View>
+                                <ThemedText type='onboarding'>Profile Picture</ThemedText>
+                                <Pressable className={`flex flex-row items-center mr-[6px] mt-[8px] p-2 rounded-3xl ${pressed ? 'bg-white/70': 'bg-white/50'}`} 
+                                    onPressIn={() => {handlePressed()}} onPressOut={() => setPressed(false)} onPress={() => {bottomRef.current?.open()}}
+                                >
+                                    <ThemedText className='w-[88%] ml-[12px]' darkColor='black' lightColor='white'>Change Profile Picture</ThemedText>
+                                    <IconSymbol name='chevron.up' size={16} color={theme==='#ECEDEE' ? 'black' : 'white'}/>
+                                </Pressable>
+                            </View>
+
+                            <View>
+                                <ThemedText type='onboarding'>Username</ThemedText>
+                                <Input
+                                    variant='rounded' size='md' className='mt-[8px] bg-white/30 border-transparent'
+                                >
+                                    <InputField placeholder={usernameInput} value={usernameInput} className='bg-slate-50' 
+                                        onChangeText={(text) => {
+                                            setUsernameInput(text);
+                                            setUsernameInvalid(false);
+                                            setInvalid(false); 
+                                        }}
+                                    />
+                                </Input>
+                            </View>
+
+                            <View>
+                                <ThemedText type='onboarding'>Email</ThemedText>
+                                <Input
+                                    variant='rounded' size='md' className='mt-[8px] bg-white/30 border-transparent'
+                                >
+                                    <InputField placeholder={emailInput} value={emailInput} className='bg-slate-50' 
+                                        onChangeText={(text) => {
+                                            setEmailInput(text);
+                                            setEmailInvalid(false);
+                                            setInvalid(false); 
+                                        }}
+                                    />
+                                </Input>
+                            </View>
+
+                            <FormControlError
+                                className={`bg-red-300 rounded-3xl p-[2px] w-[96%] bottom-[10px] flex justify-center self-center`}
+                            >
+                                <FormControlErrorIcon as={AlertCircleIcon} />
+                                <FormControlErrorText>
+                                    {error}
+                                </FormControlErrorText>
+                            </FormControlError>
+
+                        </FormControl>
+
+                        <View className='mt-[24px] flex flex-row gap-4'>
+                            <Button variant='solid' action='negative' className='flex-1' onPressIn={haptic()} onPress={() => router.back()}>
+                                <ButtonText>Cancel</ButtonText>
+                            </Button>
+                            <Button action='positive' className='flex-1' onPressIn={haptic()} onPress={() => handleConfirm()}>
+                                <ButtonText>Confirm</ButtonText>
+                            </Button>  
+                        </View>
+                        
+                    </View>
+                </View>
+
+            </View>
+            <AlertModal modalOpened={alertModal} confirmFunction={() => {router.back()}} setModalOpened={setAlertModal} isLoading={false} />
+            <Bottom ref={bottomRef} parent={'profile'} altered={imageChanged} setAltered={setImageChanged}/>
+
+        </ThemedView>
+    </GestureHandlerRootView>
   )
 }
 

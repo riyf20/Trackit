@@ -1,6 +1,6 @@
 import {create} from "zustand";
 import {persist, createJSONStorage} from "zustand/middleware";
-import {getItem, setItem, deleteItemAsync} from "expo-secure-store"
+import {getItem, setItem, deleteItemAsync, getItemAsync} from "expo-secure-store"
 
 // This defines the states that will be saved
 type UserState = {
@@ -11,7 +11,10 @@ type UserState = {
     onboardingComplete: () => void;
     onboardingReset: () => void;
 
-    logIn: ({userId, username, password, email, sessionID}:logInProps) => void;
+    logIn: ({userId, username, password, 
+        email, sessionID, defaultPicture, 
+        profilePictureFileId, profilePictureFileUrl
+    }:logInProps) => void;
     logOut: () => void;
 
     userId: string; //appwrite userid
@@ -19,10 +22,20 @@ type UserState = {
     password: string;
     email: string;
     sessionID: string,
+    defaultPicture: boolean,
+    profilePictureFileId: string
+    profilePictureFileUrl: string,
+    
 
     updateEmail: (newEmail:string) => void;
     updateUsername: (newUsername:string) => void;
     updatePassword: (newPassword:string) => void;
+    updateProfilePicture: (newFileId:string, newFileUrl:string, useDefaultPicture:boolean) => void;
+    deleteProfilePicture: () => void;
+
+    getDefaultPicture: () => boolean;
+    getProfileFileId: () => string;
+    getProfileFileUrl: () => string;
 }
 
 type logInProps = {
@@ -31,6 +44,9 @@ type logInProps = {
     password: string;
     email: string;
     sessionID: string,
+    defaultPicture: boolean,
+    profilePictureFileId: string,
+    profilePictureFileUrl: string,
 }
 
 // Export the hook, takes an arrow function that returns as object with each of the keys in our state
@@ -39,7 +55,7 @@ export const useAuthStore = create(
     
     // first argument for the persistor is what we are persisting | the object to store
     persist
-        <UserState>((set) => ({
+        <UserState>((set, get) => ({
             loggedin: false,
             onboarding: true,
             userId: "",
@@ -48,6 +64,9 @@ export const useAuthStore = create(
             password: "",
             email: "",
             sessionID: "",
+            defaultPicture: true,
+            profilePictureFileId: "",
+            profilePictureFileUrl: "",
             onboardingComplete: () => {
                 set((state) => {
                     return {
@@ -66,7 +85,7 @@ export const useAuthStore = create(
                     }
                 })
             },
-            logIn: ({userId, username, password, email, sessionID}:logInProps) => {
+            logIn: ({userId, username, password, email, sessionID, defaultPicture, profilePictureFileId, profilePictureFileUrl}:logInProps) => {
                 set((state) => {
                     return {
                         ...state,
@@ -77,6 +96,9 @@ export const useAuthStore = create(
                         password: password,
                         email: email,
                         sessionID: sessionID,
+                        defaultPicture: defaultPicture,
+                        profilePictureFileId: profilePictureFileId,
+                        profilePictureFileUrl: profilePictureFileUrl,
                     }
                 })
             },
@@ -91,6 +113,9 @@ export const useAuthStore = create(
                         password: "",
                         email: "",
                         sessionID: "",
+                        defaultPicture: true,
+                        profilePictureFileId: "",
+                        profilePictureFileUrl: "",
                     }
                 })
             },
@@ -118,8 +143,36 @@ export const useAuthStore = create(
                     }
                 }) 
             },
-        }),
-   
+            updateProfilePicture(newFileId:string, newFileUrl:string, useDefaultPicture:boolean) {
+                set((state) => {
+                    return {
+                        ...state,
+                        defaultPicture: useDefaultPicture,
+                        profilePictureFileId: newFileId,
+                        profilePictureFileUrl: newFileUrl,
+                    }
+                })
+            },
+            deleteProfilePicture() {
+                set((state) => {
+                    return {
+                        ...state,
+                        defaultPicture: true,
+                        profilePictureFileId: '',
+                        profilePictureFileUrl: '',
+                    }
+                })
+            },
+            getDefaultPicture: () => {
+                return get().defaultPicture
+            },
+            getProfileFileId: () => {
+                return get().profilePictureFileId
+            },
+            getProfileFileUrl: () => {
+                return get().profilePictureFileUrl
+            },
+        }),   
     // second argument is where we are storing it
     {
         name: "auth-store",

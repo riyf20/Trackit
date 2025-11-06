@@ -10,6 +10,7 @@ import FormInput from '@/components/FormInput';
 import { useWindowDimensions } from 'react-native';
 import { checkUser } from '@/services/appwriteUsers';
 import { loginUser, createUser, getUser } from '@/services/appwriteAccount';
+import { checkUserProfilePicture, getUserProfilePicture } from '@/services/appwriteStorage';
 import { useHapticFeedback as haptic} from '@/components/HapticTab';
 import ForgotPasswordModal from '@/components/ForgotPasswordModal';
 import * as Haptics from 'expo-haptics';
@@ -211,6 +212,9 @@ const onboardingMain = () => {
             password:passwordValue,
             email:emailValue,
             sessionID: responseLogin.$id,
+            defaultPicture: true,
+            profilePictureFileId: '',
+            profilePictureFileUrl: ''
           });
           
         } catch (error:any) {
@@ -255,6 +259,36 @@ const onboardingMain = () => {
 
   }
 
+  // Checks if user has profile picture | returns true/false
+  const checkUserProfilePic = async (fileId:string) => {
+    try {
+      const userProfilePic = await checkUserProfilePicture(fileId)
+            
+      return true;
+    } catch (error:any) {
+
+      if(error.code === 404 && error.message.includes('file could not be found')) {
+        return false;
+      }
+      console.log("Other error:")
+      console.log(error)
+      return false;
+    }
+  }
+
+  // Grabs the url of profile picture based on id
+  const getUserProfilePic = async (fileId:string) => {
+    try {
+      const profilePictureUrl = getUserProfilePicture(fileId);
+
+      return profilePictureUrl;
+    } catch (error:any) {
+      console.log("Other error:")
+      console.log(error)
+      return '';
+    }
+  }
+
   const handleLogIn = async () => {
 
     // Logic Checks
@@ -285,9 +319,17 @@ const onboardingMain = () => {
       // If user is found then login using email and password
       const userLoginResponse = await loginUser(emailValue, passwordValue);
       const userResponse = await getUser(userLoginResponse.$id);
+      
+      // Booleon value
+      const userProfilePic = await checkUserProfilePic(userLoginResponse.userId);
 
-      // debug && console.log(userLoginResponse);
-      // debug && console.log(userLoginResponse.$id);
+      let userProfilePicUrl = ''
+      if(userProfilePic) {
+        userProfilePicUrl = await getUserProfilePic(userLoginResponse.userId);
+      }
+    
+      // profile picture id will be userid 
+      // both are immutable so they are both unique;
 
       // Store all user data on device
       logIn({
@@ -296,6 +338,9 @@ const onboardingMain = () => {
         sessionID: userLoginResponse.$id,
         userId: userLoginResponse.userId,
         username: userResponse.name,
+        defaultPicture: (!userProfilePic),
+        profilePictureFileId:  `${userProfilePic ? userLoginResponse.userId : ''}`,
+        profilePictureFileUrl:userProfilePicUrl,
       })
   
     } catch (errorUserLogin:any) {
