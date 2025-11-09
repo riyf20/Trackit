@@ -38,6 +38,8 @@ const accountPassword = () => {
   // Confirmation Modal
   const [alertModal, setAlertModal] = useState(false);
 
+  const [uploading, setUploading] = useState(false);
+
   const handleConfirm = async () => {
     // Logic Checks
     const requiredFields = [
@@ -83,15 +85,20 @@ const accountPassword = () => {
     }
 
     try {
+      setUploading(true)
+      setAlertModal(true)
       const response = await updateUserPassword(previousPassword, newPassword);
 
       updatePassword(newPassword);
 
-      setAlertModal(true);
+      setUploading(false)
 
     } catch (error:any) {
 
       if(error.code === 400 && error.message.includes('Invalid `password` param:')) {
+        setAlertModal(false)
+        setUploading(false)
+
         setInvalid(true);
         setNewPasswordInvalid(true);
         setConfirmNewPasswordInvalid(true);
@@ -188,7 +195,7 @@ const accountPassword = () => {
         </View>
 
       </View>
-      <AlertModal modalOpened={alertModal} confirmFunction={() => {router.back()}} setModalOpened={setAlertModal} />
+      <AlertModal modalOpened={alertModal} confirmFunction={() => {router.back()}} setModalOpened={setAlertModal} isLoading={uploading}/>
     </ThemedView>
   )
 }

@@ -14,7 +14,8 @@ import {
 import { useThemeColor } from '@/hooks/use-theme-color';
 import Animated, { useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
 import { checkUser } from '@/services/appwriteUsers';
-import { resetPasswordEmail } from '@/services/resendEmails';
+import { resetPasswordEmail } from '@/services/future/resendEmails';
+import { useAuthStore } from '@/utils/authStore';
 
 
 {/* TO DO: finish implementation | need to link email provider */}
@@ -22,6 +23,7 @@ const ForgotPasswordModal = ({forgotPasswordShowModal, setForgotPasswordShowModa
 
   const theme = useThemeColor({}, 'text');
 
+  const { email} = useAuthStore()
     
   const keyboardshift = useSharedValue(0);
   
@@ -108,12 +110,8 @@ const ForgotPasswordModal = ({forgotPasswordShowModal, setForgotPasswordShowModa
 
     // username and password
     try {
-      const response = await checkUser(usernameValue);
 
-      const verifyEmail = response.email;
-      // const emailTarget = response.targets[0].$id;
-
-      if(verifyEmail!==emailValue) {
+      if(email!==emailValue) {
         setFormInvalid(true)
         setError("Please check Username and Email.")
         return;

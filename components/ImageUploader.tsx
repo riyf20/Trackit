@@ -1,23 +1,19 @@
 import React, { useEffect, useState,  } from "react";
-import { ScrollView, TouchableOpacity, View, Image } from "react-native";
+import { View, Image } from "react-native";
 import { Box, Button, ButtonText, ButtonGroup, 
-    Heading, HStack, Pressable, Text, VStack, 
-Icon, CloseIcon } from "@gluestack-ui/themed";
+    Heading, HStack, Pressable, Text, VStack } from "@gluestack-ui/themed";
 import * as ImagePicker from "expo-image-picker";
-// import { UploadCloud } from "lucide-react-native";
-import ImageView from "react-native-image-viewing";
-import ImageCard from "./ImageCard";
-// import InfoModal from "./InfoModal";
 import { useHapticFeedback} from '@/components/HapticTab';
 import { IconSymbol } from "./ui/icon-symbol";
 import { useThemeColor } from "@/hooks/use-theme-color";
 import { useAuthStore } from "@/utils/authStore";
 import { images } from "@/constants/images";
-import { ThemedText } from "./themed-text";
 import { deleteUserProfilePicture, getUserProfilePicture } from "@/services/appwriteStorage";
 import {updateUserProfilePicture} from '@/services/appwriteStorageWeb'
 import AlertModal from "./AlertModal";
 import { router } from "expo-router";
+import { updatePictureTable } from "@/services/appwriteDatabase";
+
 
 // [Imported from BlogApp] A customized image picker for user's profile picture
 const ImageUploader = ({setClose, setAltered}:ImageUploaderProps) => {
@@ -66,7 +62,7 @@ const ImageUploader = ({setClose, setAltered}:ImageUploaderProps) => {
 
         const pickedImage = result.assets[0];
         setNewImage(pickedImage);
-
+        
         setChanges(true);
         
     };
@@ -95,6 +91,14 @@ const ImageUploader = ({setClose, setAltered}:ImageUploaderProps) => {
                     setAlertModal(true);
 
                     const remove = await deleteUserProfilePicture(profilePictureFileId);
+
+                    // Send the url to table
+                    try {
+                        const response = await updatePictureTable(userId, '');
+                    } catch (error:any) {
+                        console.log("Error adding picture url to table [reverting]")
+                        console.log(error)
+                    }
 
                     updateProfilePicture("","", true);
 
@@ -129,6 +133,14 @@ const ImageUploader = ({setClose, setAltered}:ImageUploaderProps) => {
                                 // Grabs url of the new picture
                                 const newUrl = getUserProfilePicture(userId);
 
+                                // Send the url to table
+                                try {
+                                    const response = await updatePictureTable(userId, newUrl);
+                                } catch (error:any) {
+                                    console.log("Error adding picture url to table [old pic --> new pic]")
+                                    console.log(error)
+                                }
+
                                 // Saves url and image data to device storage
                                 updateProfilePicture(userId, newUrl, false);
 
@@ -156,6 +168,14 @@ const ImageUploader = ({setClose, setAltered}:ImageUploaderProps) => {
                             // Grabs url of the new picture
                             const newUrl = getUserProfilePicture(userId);
 
+                            // Send the url to table
+                            try {
+                                const response = await updatePictureTable(userId, newUrl);
+                            } catch (error:any) {
+                                console.log("Error adding picture url to table [default --> new pic]")
+                                console.log(error)
+                            }
+
                             // Saves url and image data to device storage
                             updateProfilePicture(userId, newUrl, false);
 
@@ -181,67 +201,72 @@ const ImageUploader = ({setClose, setAltered}:ImageUploaderProps) => {
     
     return (
     <>
-        <HStack className="justify-between w-full mt-3 ">
-            <VStack>
-                <Heading size="md" className="font-semibold" color="black" >
-                    Change Profile Picture
-                </Heading>
-                <Text size="sm" color="gray" >JPG, PNG, IMG supported</Text>
-            </VStack>
-        
-            {/* Close sheet button */}
-            <Pressable onPress={setClose} onPressIn={haptic}>
-                <IconSymbol name='multiply.circle' size={40} color={'black'}  />
-            </Pressable>
 
-        </HStack>
+        <View className="">
 
-        <Box className="my-[18px] items-center justify-center rounded-xl bg-background-50  h-[275px] w-full bg-[A9A9A9]">
+            <HStack className="justify-between w-full">
+                <VStack className="flex gap-[4px]">
+                    <Heading size="md" className="font-semibold" color="black" >
+                        Change Profile Picture
+                    </Heading>
+                    <Text size="sm" color="gray" >JPG, PNG, IMG supported</Text>
+                </VStack>
+            
+                {/* Close sheet button */}
+                <Pressable onPress={setClose} onPressIn={haptic} className="self-center">
+                    <IconSymbol name='multiply.circle' size={40} color={'black'}  />
+                </Pressable>
 
-            {changes ? 
-                <Image
-                    source={reverted ? images.profile : {uri: newImage?.uri} } 
-                    className='w-[250px] h-[250px] rounded-3xl self-center my-[12px]'
-                    resizeMode="cover"
-                /> 
-            :
-                <Image
-                    source={basePicture ? images.profile : {uri: profilePictureFileUrl} } 
-                    className='w-[250px] h-[250px] rounded-3xl self-center my-[12px]'
-                    resizeMode="cover"
-                />
-            }
+            </HStack>
 
-        </Box>
+            <Box className="my-[8px] items-center justify-center rounded-xl bg-background-50 bg-[A9A9A9]">
 
-        {/* Button bar */}
-        {!basePicture &&
-        <ButtonGroup className="w-[90%] flex justify-center mb-[12px]">
-            <Button className="w-[100%] rounded-3xl" variant="link" action="secondary" onPress={() => {handleRevert()}}>
-                <ButtonText>Revert to Default</ButtonText>
-            </Button>
-        </ButtonGroup>
-        }
-        <ButtonGroup className="w-[90%] flex justify-center">
-            <Button className="w-[70%] align-middle gap-2" onPress={handleBrowseFiles} >
-                <IconSymbol name='square.and.pencil' size={24} color={'white'}  />
-                <ButtonText>Change</ButtonText>
-            </Button>
-        </ButtonGroup>
+                {changes ? 
+                    <Image
+                        source={reverted ? images.profile : {uri: newImage?.uri} } 
+                        className='w-[250px] h-[250px] rounded-3xl self-center my-[12px]'
+                        resizeMode="cover"
+                    /> 
+                :
+                    <Image
+                        source={basePicture ? images.profile : {uri: profilePictureFileUrl} } 
+                        className='w-[250px] h-[250px] rounded-3xl self-center my-[12px]'
+                        resizeMode="cover"
+                    />
+                }
 
-        <View className="fixed top-[80px]">
-            <ButtonGroup className="w-[90%] flex justify-center">
-
-                <Button className="w-[50%]" variant="solid" action="secondary" onPress={setClose}>
-                    <ButtonText>Cancel</ButtonText>
-                </Button>
-                <Button className="w-[50%]" variant="solid" action="positive" onPress={() => {handleSave()}} >
-                    <ButtonText>Save</ButtonText>
+            </Box> 
+            
+            {/* Button bar */}
+            {!basePicture &&
+            <ButtonGroup className="flex justify-center ">
+                <Button className="w-[100%] rounded-3xl" variant="link" action="secondary" onPress={() => {handleRevert()}}>
+                    <ButtonText>Revert to Default</ButtonText>
                 </Button>
             </ButtonGroup>
-        </View>
+            }
+            <ButtonGroup className={`flex justify-center ${!basePicture ? 'mt-[10px]' : 'mt-[30px]'} `}>
+                <Button className="w-[50%] align-middle gap-2" onPress={handleBrowseFiles} >
+                    <IconSymbol name='square.and.pencil' size={24} color={'white'}  />
+                    <ButtonText>Change</ButtonText>
+                </Button>
+            </ButtonGroup>
+
+            <View className="absolute bottom-[-24%] mt-[-20px]">
+                <ButtonGroup className="flex justify-center">
+
+                    <Button className="w-[50%]" variant="solid" action="secondary" onPress={setClose}>
+                        <ButtonText>Cancel</ButtonText>
+                    </Button>
+                    <Button className="w-[50%]" variant="solid" action="positive" onPress={() => {handleSave()}} >
+                        <ButtonText>Save</ButtonText>
+                    </Button>
+                </ButtonGroup>
+            </View> 
+
+            <AlertModal modalOpened={alertModal} confirmFunction={() => router.back()} setModalOpened={setAlertModal} isLoading={uploading} />
         
-        <AlertModal modalOpened={alertModal} confirmFunction={() => router.back()} setModalOpened={setAlertModal} isLoading={uploading} />
+        </View>    
         
     </>
     );

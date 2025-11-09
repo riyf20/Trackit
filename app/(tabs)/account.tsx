@@ -1,19 +1,26 @@
-import { View, Pressable, ScrollView, Platform } from 'react-native'
-import React, { useState } from 'react'
+import { View, Pressable, ScrollView, Platform, Text } from 'react-native'
+import React, { useCallback, useEffect, useState } from 'react'
 import { ThemedView } from '@/components/themed-view'
 import { ThemedText } from '@/components/themed-text'
 import { IconSymbol } from '@/components/ui/icon-symbol'
 import { useThemeColor } from '@/hooks/use-theme-color';
 import AccountCard from '@/components/AccountCard'
-import { router } from 'expo-router'
+import { router, useFocusEffect } from 'expo-router'
 import { details, detailsRoutes, social, socialRoutes, 
   progress, progressRoutes } from '@/constants/settings'
 import { GlassView } from 'expo-glass-effect'
 import * as Haptics from 'expo-haptics';
 import { BlurView } from 'expo-blur'
+import Animated, { useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated'
+import { useAuthStore } from '@/utils/authStore'
+import { getUserById } from '@/services/appwriteDatabase'
 
 // [Account tab] - User settings page
 const account = () => {
+  
+  // On device variables
+  const { userId, updateInvitescount, invitesCount } = useAuthStore();
+
 
   // Used to check if glass view (ios 26) can be used
   const iosVersion = Platform.Version;
@@ -56,7 +63,62 @@ const account = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
   }
 
+  // State to hold if card was expanded
+  const [expanded, setExpanded] = useState(false);
 
+  // Animation variables to move page down if card was expanded
+  const fullPage = useSharedValue(0);
+  
+  const fullPageStyle = useAnimatedStyle(() => ({
+    transform: [
+      { translateY: fullPage.value }
+    ],
+  }));
+  
+  useEffect(() => {
+    if(expanded){
+      // Moves page down
+      fullPage.value = withTiming(120, { duration: 700 });
+    } else {
+      // Resets
+      fullPage.value = withTiming(0, { duration: 700 });
+    }
+  }, [expanded])
+
+  // Number of invites user has
+  const [numberOfInvites, setNumberOfInvites] = useState(0);
+    
+  // Fetches number of invites from database
+  const fetchData = async () => {
+    try {
+      const response = await getUserById(userId);
+
+      const inviteArray = (response.Invites || []);
+      if(inviteArray.length > 0) {
+        setNumberOfInvites(inviteArray.length)
+      }
+
+    } catch (error: any) {
+      console.log("Error fetching user's invites");
+    }
+  };
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  useEffect(() => {
+    updateInvitescount(numberOfInvites);
+  }, [numberOfInvites])
+
+  // On focus will refresh data from device storage
+  useFocusEffect(
+    useCallback(() => {
+      router.reload
+      fetchData();
+    }, [])
+  );
+    
   return (
 
     <ThemedView className='h-full flex '>
@@ -64,18 +126,20 @@ const account = () => {
       {/* Scrollview of setting and user data */}
       <ScrollView 
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={{paddingBottom: 125, marginTop: 120,}}
+        contentContainerStyle={{
+          paddingBottom: expanded ? 575 : 450, 
+          marginTop: 120,}}
       >
 
         {/* Account card component */}
         <View
-          className="flex h-[fit] items-center mt-[10px]"
+          className="flex h-[fit] items-center mt-[20px] mb-[-70%]"
         > 
-          <AccountCard/>
+          <AccountCard setExpanded={setExpanded} />
         </View>
 
         {/* List of other settings */}
-        <View className='w-[90%] self-center'>
+        <Animated.View  style={fullPageStyle} className='w-[90%] self-center '>
 
           <ThemedText type='settingSubheading'>Account Details</ThemedText>
           {/* Maps over account details section [Title, Route, and pressed state] */}
@@ -89,7 +153,11 @@ const account = () => {
           {/* Maps over friends and social section [Title, Route, and pressed state] */}
           {social?.map((item:string, index) => (
             <View key={index} className={`p-[8px]  ${index==0 ? 'mt-[12px] rounded-t-[16px]' : index+1==social.length ? 'mb-[12px] rounded-b-[16px]' : ''} flex gap-6 py-[20px] backdrop-blur-md shadow-2xl shadow-black/40  ${theme==='#ECEDEE' ? `${socialStates[index] ? 'bg-white/20' : 'bg-white/10'}` : `${socialStates[index] ? 'bg-black/20' : 'bg-black/10'}`} `}>
-              <Pressable className='flex flex-row items-center mr-[6px]' onPressIn={() => { socialStatesSetter[index](true)} } onPressOut={() => {socialStatesSetter[index](false)}} onPress={() => router.push(socialRoutes[index] as any)}><ThemedText className='ml-[16px] flex-1 ' type='settingSuboptions' >{item}</ThemedText><IconSymbol name='chevron.right' size={16} color={'gray'}/></Pressable>
+              <Pressable className='flex flex-row items-center mr-[6px]' onPressIn={() => { socialStatesSetter[index](true)} } onPressOut={() => {socialStatesSetter[index](false)}} onPress={() => router.push(socialRoutes[index] as any)}><ThemedText className='ml-[16px] flex-1 ' type='settingSuboptions' > {item} </ThemedText>
+              {index===2 && invitesCount > 0 &&
+                <View className='absolute right-[30px] align-middle bg-red-500 p-2 rounded-full' />
+              }
+                <IconSymbol name='chevron.right' size={16} color={'gray'}/></Pressable>
             </View>
           ))}
           
@@ -101,10 +169,9 @@ const account = () => {
             </View>
           ))}
 
-        </View>
+        </Animated.View>
 
       </ScrollView>
-
 
       {/* Account header with more settings button (placed at bottom so scrollview renders and can be view beneath blurview) */}
       {useGlass ? 

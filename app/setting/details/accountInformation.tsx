@@ -16,13 +16,14 @@ import AlertModal from '@/components/AlertModal'
 import Bottom from '@/components/Bottom'
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import * as Haptics from 'expo-haptics';
+import { updateUsernameTable } from '@/services/appwriteDatabase'
 
 // Allows users to change profile picture, username, and email
 const accountInformation = () => {
 
     const theme = useThemeColor({}, 'text');
 
-    const {username, email, password, updateEmail, updateUsername, 
+    const {userId, username, email, password, updateEmail, updateUsername, 
         profilePictureFileId, profilePictureFileUrl, defaultPicture,
         getDefaultPicture, getProfileFileId, getProfileFileUrl
     } = useAuthStore();
@@ -102,32 +103,44 @@ const accountInformation = () => {
 
             // Username was changed
             if(usernameInput!==username) {
+
                 try {
+                    const response = updateUsernameTable(userId, usernameInput)
 
-                    // Api call to change username
-                    const response = await updateUserUsername(usernameInput);
+                    try {
+                        
 
-                    // Saves the changes on device 
-                    updateUsername(usernameInput);
-                    
-                } catch (error:any) {
+                        // Api call to change username
+                        const response = await updateUserUsername(usernameInput);
 
-                    if(error.code === 400 && error.message.includes('Invalid `username` param:')) {
-                        setInvalid(true);
-                        setUsernameInvalid(true);
-                        setError("Please enter a valid username.")
-                    } else {
-                        setInvalid(true);
-                        setError("An unexpected error occured.")
+                        // Saves the changes on device 
+                        updateUsername(usernameInput);
+                        setAlertModal(true);
+                        
+                    } catch (error:any) {
+
+                        if(error.code === 400 && error.message.includes('Invalid `username` param:')) {
+                            setInvalid(true);
+                            setUsernameInvalid(true);
+                            setError("Please enter a valid username.")
+                        } else {
+                            setInvalid(true);
+                            setError("An unexpected error occured.")
+                        }
+
+                        console.log(error)
+                        console.log(error.code)
+                        console.log(error.message)
                     }
 
+                } catch (error:any) {
+                    console.log("Error occured updating table")
                     console.log(error)
-                    console.log(error.code)
-                    console.log(error.message)
                 }
+
             }
 
-            setAlertModal(true);
+            
 
         }
     }

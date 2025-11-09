@@ -60,6 +60,10 @@ interface ImageCardProps {
     parent: string;
 }
 
+interface AccountCardProps {
+    setExpanded: (args0: boolean) => void
+}
+
 // Can be used later...
 // interface ImageItem {
 //     filePath: string;
@@ -67,3 +71,26 @@ interface ImageCardProps {
 //     base64: string;
 //     id?:number
 // }
+
+interface UserSearchCardProps {
+    user:User,
+    usersFriends?: string[]
+    usersRequested?: string[]
+    usersInvites?: string[]
+}
+
+interface User {
+    User: string,
+    User_Profile_Picture:string,
+    UsersID: string,
+}
+
+interface UserCardProps {
+    userid: string,
+    parent?: string,
+    unaddedUserid?: (args0:string) => void;
+}
+
+interface UserCardMenuProps {
+    handleUnfriend: () => void;
+}

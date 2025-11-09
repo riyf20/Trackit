@@ -5,8 +5,10 @@ const sdk = require('node-appwrite');
 const debug = false;
 
 const client = new sdk.Client()
-    .setEndpoint(process.env.EXPO_PUBLIC_APPWRITE_ENDPOINT) // Appwrite API Endpoint
-    .setProject(process.env.EXPO_PUBLIC_APPWRITE_PROJECT_ID) // Appwrite project ID
+    // API Endpoint
+    .setEndpoint(process.env.EXPO_PUBLIC_APPWRITE_ENDPOINT) 
+    // Appwrite Project ID
+    .setProject(process.env.EXPO_PUBLIC_APPWRITE_PROJECT_ID) 
 
 
 // Endpoint: Creates a new user

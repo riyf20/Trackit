@@ -1,16 +1,13 @@
 import { NativeTabs, Icon, Label, Badge } from 'expo-router/unstable-native-tabs';
 import React from 'react';
-
-// import { HapticTab } from '@/components/haptic-tab';
-// use for habtics later ^
-import { IconSymbol } from '@/components/ui/icon-symbol';
-import { Colors } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
-import { DynamicColorIOS } from 'react-native';
+import { useAuthStore } from '@/utils/authStore';
 
 
 export default function TabLayout() {
-  const colorScheme = useColorScheme();
+
+  // Used to show badge
+  const { invitesCount } = useAuthStore();
 
   return (
     <NativeTabs>
@@ -46,7 +43,9 @@ export default function TabLayout() {
           sf={{ default: "person.crop.circle", selected: "person.crop.circle.fill" }}
           drawable="ic_menu_manage" 
         />
-        {/* <Badge>9+</Badge> */}
+        {invitesCount > 0 &&
+          <Badge>{invitesCount.toString()}</Badge>
+        }
       </NativeTabs.Trigger>
       
     </NativeTabs>

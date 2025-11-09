@@ -14,6 +14,7 @@ import { checkUserProfilePicture, getUserProfilePicture } from '@/services/appwr
 import { useHapticFeedback as haptic} from '@/components/HapticTab';
 import ForgotPasswordModal from '@/components/ForgotPasswordModal';
 import * as Haptics from 'expo-haptics';
+import { addUserTable } from '@/services/appwriteDatabase';
 
 
 // Log/Sign up page
@@ -200,29 +201,41 @@ const onboardingMain = () => {
       try {
         const response = await createUser(emailValue, passwordValue, usernameValue);
 
-        // Successfully created new user --> log in and create session
+        
+        // Add this new user to table
         try {
-
-          const responseLogin = await loginUser(emailValue, passwordValue);
-
-          // Save all data to device storage and login
-          logIn({
-            userId:usernameValue,
-            username:usernameValue,
-            password:passwordValue,
-            email:emailValue,
-            sessionID: responseLogin.$id,
-            defaultPicture: true,
-            profilePictureFileId: '',
-            profilePictureFileUrl: ''
-          });
+          const responseTable = await addUserTable(usernameValue)
           
+          try {
+            // Successfully created new user --> log in and create session
+            const responseLogin = await loginUser(emailValue, passwordValue);
+
+            // Save all data to device storage and login
+            logIn({
+              userId:usernameValue,
+              username:usernameValue,
+              password:passwordValue,
+              email:emailValue,
+              sessionID: responseLogin.$id,
+              defaultPicture: true,
+              profilePictureFileId: '',
+              profilePictureFileUrl: ''
+            });
+            
+          } catch (error:any) {
+            setFormInvalid(true);
+            signUpTranslateY.value = withTiming(150, { duration: 400 });
+            setError("An unexpected error occured.");
+          }
+
         } catch (error:any) {
+          console.log("Error adding user to table")
+          console.log(error)
+          
           setFormInvalid(true);
           signUpTranslateY.value = withTiming(150, { duration: 400 });
           setError("An unexpected error occured.");
         }
-
       
       } catch (errorCreate:any) {
 

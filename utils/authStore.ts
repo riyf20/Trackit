@@ -36,6 +36,9 @@ type UserState = {
     getDefaultPicture: () => boolean;
     getProfileFileId: () => string;
     getProfileFileUrl: () => string;
+
+    invitesCount: number;
+    updateInvitescount: (newCount:number) => void;
 }
 
 type logInProps = {
@@ -67,6 +70,7 @@ export const useAuthStore = create(
             defaultPicture: true,
             profilePictureFileId: "",
             profilePictureFileUrl: "",
+            invitesCount: 0,
             onboardingComplete: () => {
                 set((state) => {
                     return {
@@ -99,6 +103,7 @@ export const useAuthStore = create(
                         defaultPicture: defaultPicture,
                         profilePictureFileId: profilePictureFileId,
                         profilePictureFileUrl: profilePictureFileUrl,
+                        invitesCount: 0,
                     }
                 })
             },
@@ -116,6 +121,7 @@ export const useAuthStore = create(
                         defaultPicture: true,
                         profilePictureFileId: "",
                         profilePictureFileUrl: "",
+                        invitesCount: 0,
                     }
                 })
             },
@@ -171,6 +177,14 @@ export const useAuthStore = create(
             },
             getProfileFileUrl: () => {
                 return get().profilePictureFileUrl
+            },
+            updateInvitescount(newCount:number) {
+                set((state) => {
+                    return {
+                        ...state,
+                        invitesCount: newCount,
+                    }
+                })
             },
         }),   
     // second argument is where we are storing it
