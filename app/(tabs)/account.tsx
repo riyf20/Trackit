@@ -8,19 +8,17 @@ import AccountCard from '@/components/AccountCard'
 import { router, useFocusEffect } from 'expo-router'
 import { details, detailsRoutes, social, socialRoutes, 
   progress, progressRoutes } from '@/constants/settings'
-import { GlassView } from 'expo-glass-effect'
 import * as Haptics from 'expo-haptics';
-import { BlurView } from 'expo-blur'
 import Animated, { useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated'
 import { useAuthStore } from '@/utils/authStore'
 import { getUserById } from '@/services/appwriteDatabase'
+import Header from '@/components/Header'
 
-// [Account tab] - User settings page
+// [Account Tab] - User settings page
 const account = () => {
   
   // On device variables
   const { userId, updateInvitescount, invitesCount } = useAuthStore();
-
 
   // Used to check if glass view (ios 26) can be used
   const iosVersion = Platform.Version;
@@ -121,7 +119,7 @@ const account = () => {
     
   return (
 
-    <ThemedView className='h-full flex '>
+    <ThemedView className='h-full flex flex-1 w-full'>
 
       {/* Scrollview of setting and user data */}
       <ScrollView 
@@ -173,51 +171,7 @@ const account = () => {
 
       </ScrollView>
 
-      {/* Account header with more settings button (placed at bottom so scrollview renders and can be view beneath blurview) */}
-      {useGlass ? 
-        <GlassView 
-          style={{
-            height: '13%',
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            width: '100%',
-            justifyContent: 'center',
-            borderBottomLeftRadius: 10,
-            borderBottomRightRadius: 10,
-          }}
-        >
-          <ThemedText type='title' className='items-left justify-start absolute ml-[30px] mt-[75px]'>Account</ThemedText>
-          
-          <View className={`items-right justify-end absolute top-[74px] right-0 mr-[30px] border-2 border-transparent rounded-full p-[3px] ${iconPressed ? (theme==='#ECEDEE' ? 'bg-white/20' : 'bg-black/20') : 'bg-transparent' } `}>
-            <Pressable
-              onPressIn={handleIconPressed}
-              onPressOut={() => {setIconPressed(false)}}
-              onPress={() => {router.push('/setting/systemSetting')}}
-            >
-              <IconSymbol name='gear' size={35} color={theme}/>
-            </Pressable>
-          </View> 
-        </GlassView>
-        :
-        <BlurView
-          intensity={30} 
-          tint={`${theme==='#ECEDEE' ? 'dark' : 'light'}`}
-          className='h-[13%] absolute top-0 left-0 w-full flex justify-center rounded-b-3xl'
-        >
-          <ThemedText type='title' className='items-left justify-start absolute ml-[30px] mt-[75px]'>Account</ThemedText>
-          
-          <View className={`items-right justify-end absolute top-[74px] right-0 mr-[30px] border-2 border-transparent rounded-full p-[3px] ${iconPressed ? (theme==='#ECEDEE' ? 'bg-white/20' : 'bg-black/20') : 'bg-transparent' } `}>
-            <Pressable
-              onPressIn={handleIconPressed}
-              onPressOut={() => {setIconPressed(false)}}
-              onPress={() => {router.push('/setting/systemSetting')}}
-            >
-              <IconSymbol name='gear' size={35} color={theme}/>
-            </Pressable>
-          </View> 
-        </BlurView>
-      }
+      <Header parent={'Account'} />
 
     </ThemedView>
     

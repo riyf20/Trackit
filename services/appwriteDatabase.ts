@@ -1,4 +1,4 @@
-import { Query } from "react-native-appwrite";
+import { ID, Query } from "react-native-appwrite";
 
 const sdk = require('node-appwrite');
 
@@ -15,7 +15,7 @@ export const addUserTable = async (username:string) => {
 
     const result = await databases.createDocument({
         databaseId: process.env.EXPO_PUBLIC_APPWRITE_DATABASE_ID,
-        collectionId: process.env.EXPO_PUBLIC_APPWRITE_COLLECTION_ID,
+        collectionId: process.env.EXPO_PUBLIC_APPWRITE_USERS_COLLECTION_ID,
         documentId: username,
         data: {
             "User": username,
@@ -28,7 +28,7 @@ export const updateUsernameTable = async (userId:string, newUsername:string) => 
 
     const result = await databases.updateDocument({
         databaseId: process.env.EXPO_PUBLIC_APPWRITE_DATABASE_ID,
-        collectionId: process.env.EXPO_PUBLIC_APPWRITE_COLLECTION_ID,
+        collectionId: process.env.EXPO_PUBLIC_APPWRITE_USERS_COLLECTION_ID,
         documentId: userId,
         data: {
             "User": newUsername,
@@ -41,7 +41,7 @@ export const updatePictureTable = async (userId:string, newUrl:string) => {
 
     const result = await databases.updateDocument({
         databaseId: process.env.EXPO_PUBLIC_APPWRITE_DATABASE_ID,
-        collectionId: process.env.EXPO_PUBLIC_APPWRITE_COLLECTION_ID,
+        collectionId: process.env.EXPO_PUBLIC_APPWRITE_USERS_COLLECTION_ID,
         documentId: userId,
         data: {
             "User_Profile_Picture": newUrl,
@@ -55,7 +55,7 @@ export const updateRequestedTable = async (userId:string, requestedUser:string) 
     // Gets user's data
     const currentList = await databases.getDocument({
         databaseId: process.env.EXPO_PUBLIC_APPWRITE_DATABASE_ID,
-        collectionId: process.env.EXPO_PUBLIC_APPWRITE_COLLECTION_ID,
+        collectionId: process.env.EXPO_PUBLIC_APPWRITE_USERS_COLLECTION_ID,
         documentId: userId,
     })
 
@@ -65,7 +65,7 @@ export const updateRequestedTable = async (userId:string, requestedUser:string) 
     // Updates user's data
     const result = await databases.updateDocument({
         databaseId: process.env.EXPO_PUBLIC_APPWRITE_DATABASE_ID,
-        collectionId: process.env.EXPO_PUBLIC_APPWRITE_COLLECTION_ID,
+        collectionId: process.env.EXPO_PUBLIC_APPWRITE_USERS_COLLECTION_ID,
         documentId: userId,
         data: {
             "Requested": updatedFriends,
@@ -75,7 +75,7 @@ export const updateRequestedTable = async (userId:string, requestedUser:string) 
     // Gets 'requestedUser' data
     const currentListFromRequested = await databases.getDocument({
         databaseId: process.env.EXPO_PUBLIC_APPWRITE_DATABASE_ID,
-        collectionId: process.env.EXPO_PUBLIC_APPWRITE_COLLECTION_ID,
+        collectionId: process.env.EXPO_PUBLIC_APPWRITE_USERS_COLLECTION_ID,
         documentId: requestedUser,
     })
 
@@ -85,7 +85,7 @@ export const updateRequestedTable = async (userId:string, requestedUser:string) 
     // Updates 'requestedUser's data
     const resultFromRequested = await databases.updateDocument({
         databaseId: process.env.EXPO_PUBLIC_APPWRITE_DATABASE_ID,
-        collectionId: process.env.EXPO_PUBLIC_APPWRITE_COLLECTION_ID,
+        collectionId: process.env.EXPO_PUBLIC_APPWRITE_USERS_COLLECTION_ID,
         documentId: requestedUser,
         data: {
             "Invites": updatedInvite,
@@ -99,7 +99,7 @@ export const searchUserTable = async (search:string) => {
     // Gets results of queried search
     const result = await databases.listDocuments({
         databaseId: process.env.EXPO_PUBLIC_APPWRITE_DATABASE_ID,
-        collectionId: process.env.EXPO_PUBLIC_APPWRITE_COLLECTION_ID,
+        collectionId: process.env.EXPO_PUBLIC_APPWRITE_USERS_COLLECTION_ID,
         queries: [
             Query.search('User', search)
         ]
@@ -128,7 +128,7 @@ export const getUserById = async (userId:string) => {
 
     const currentList = await databases.getDocument({
         databaseId: process.env.EXPO_PUBLIC_APPWRITE_DATABASE_ID,
-        collectionId: process.env.EXPO_PUBLIC_APPWRITE_COLLECTION_ID,
+        collectionId: process.env.EXPO_PUBLIC_APPWRITE_USERS_COLLECTION_ID,
         documentId: userId,
     })
 
@@ -141,7 +141,7 @@ export const acceptInviteTable = async (userId:string, inviteFromUser:string) =>
     // Gets user's data
     const currentList = await databases.getDocument({
         databaseId: process.env.EXPO_PUBLIC_APPWRITE_DATABASE_ID,
-        collectionId: process.env.EXPO_PUBLIC_APPWRITE_COLLECTION_ID,
+        collectionId: process.env.EXPO_PUBLIC_APPWRITE_USERS_COLLECTION_ID,
         documentId: userId,
     })
 
@@ -154,7 +154,7 @@ export const acceptInviteTable = async (userId:string, inviteFromUser:string) =>
     // Updates user's data
     const result = await databases.updateDocument({
         databaseId: process.env.EXPO_PUBLIC_APPWRITE_DATABASE_ID,
-        collectionId: process.env.EXPO_PUBLIC_APPWRITE_COLLECTION_ID,
+        collectionId: process.env.EXPO_PUBLIC_APPWRITE_USERS_COLLECTION_ID,
         documentId: userId,
         data: {
             "Invites": updatedInvite,
@@ -165,7 +165,7 @@ export const acceptInviteTable = async (userId:string, inviteFromUser:string) =>
     // Gets inviteFromUser's data
     const currentListFromUser = await databases.getDocument({
         databaseId: process.env.EXPO_PUBLIC_APPWRITE_DATABASE_ID,
-        collectionId: process.env.EXPO_PUBLIC_APPWRITE_COLLECTION_ID,
+        collectionId: process.env.EXPO_PUBLIC_APPWRITE_USERS_COLLECTION_ID,
         documentId: inviteFromUser,
     })
 
@@ -177,7 +177,7 @@ export const acceptInviteTable = async (userId:string, inviteFromUser:string) =>
     // Updates 'inviteFromUser's data
     const resultFromUser = await databases.updateDocument({
         databaseId: process.env.EXPO_PUBLIC_APPWRITE_DATABASE_ID,
-        collectionId: process.env.EXPO_PUBLIC_APPWRITE_COLLECTION_ID,
+        collectionId: process.env.EXPO_PUBLIC_APPWRITE_USERS_COLLECTION_ID,
         documentId: inviteFromUser,
         data: {
             "Requested": updatedRequestedFromUser,
@@ -193,7 +193,7 @@ export const unfriendTable = async (userId:string, secondUser:string) => {
     // Gets user's data
     const currentList = await databases.getDocument({
         databaseId: process.env.EXPO_PUBLIC_APPWRITE_DATABASE_ID,
-        collectionId: process.env.EXPO_PUBLIC_APPWRITE_COLLECTION_ID,
+        collectionId: process.env.EXPO_PUBLIC_APPWRITE_USERS_COLLECTION_ID,
         documentId: userId,
     })
 
@@ -203,7 +203,7 @@ export const unfriendTable = async (userId:string, secondUser:string) => {
     // Updates user's data
     const result = await databases.updateDocument({
         databaseId: process.env.EXPO_PUBLIC_APPWRITE_DATABASE_ID,
-        collectionId: process.env.EXPO_PUBLIC_APPWRITE_COLLECTION_ID,
+        collectionId: process.env.EXPO_PUBLIC_APPWRITE_USERS_COLLECTION_ID,
         documentId: userId,
         data: {
             "Friends": updateFriends,
@@ -213,7 +213,7 @@ export const unfriendTable = async (userId:string, secondUser:string) => {
     // Gets secondUser's data
     const currentListSecondUser = await databases.getDocument({
         databaseId: process.env.EXPO_PUBLIC_APPWRITE_DATABASE_ID,
-        collectionId: process.env.EXPO_PUBLIC_APPWRITE_COLLECTION_ID,
+        collectionId: process.env.EXPO_PUBLIC_APPWRITE_USERS_COLLECTION_ID,
         documentId: secondUser,
     })
 
@@ -223,11 +223,57 @@ export const unfriendTable = async (userId:string, secondUser:string) => {
     // Updates 'secondUser's data
     const resultSecondUser = await databases.updateDocument({
         databaseId: process.env.EXPO_PUBLIC_APPWRITE_DATABASE_ID,
-        collectionId: process.env.EXPO_PUBLIC_APPWRITE_COLLECTION_ID,
+        collectionId: process.env.EXPO_PUBLIC_APPWRITE_USERS_COLLECTION_ID,
         documentId: secondUser,
         data: {
             "Friends": updateFriendsSecondUser,
         },
     })
 
+}
+
+
+// Endpoint: Adds new contract 
+export const addUserContract = async (username:string, userid:string, habitName:string, habitIcon:string,
+    frequency:string, count:number, duration:string, expiration:string, difficulty:string, totalDays: number) => {
+
+    const result = await databases.createDocument({
+        databaseId: process.env.EXPO_PUBLIC_APPWRITE_DATABASE_ID,
+        collectionId: process.env.EXPO_PUBLIC_APPWRITE_CONTRACTS_COLLECTION_ID,
+        documentId: ID.unique(),
+        data: {
+            "Username": username,
+            "User_ID": userid,
+            "Habit_Name": habitName,
+            "Habit_Icon": habitIcon,
+            "Frequency": frequency,
+            "Count": count,
+            "Duration": duration,
+            "Expiration": expiration,
+            "Difficulty": difficulty, 
+            "Total_Days": totalDays,
+        },
+    })
+
+    // console.log(result);
+}
+
+// Endpoint: Queries' based on given username 
+export const searchUserContract = async (username:string, userID:string) => {
+
+    // Gets results of queried search
+    const result = await databases.listDocuments({
+        databaseId: process.env.EXPO_PUBLIC_APPWRITE_DATABASE_ID,
+        collectionId: process.env.EXPO_PUBLIC_APPWRITE_CONTRACTS_COLLECTION_ID,
+        queries: [
+            Query.search('User_ID', userID)
+        ]
+    })
+
+    // If no result was found just returns false
+    if(result.total === 0) {
+        return false
+    } else {
+        return(result);
+    }
 }

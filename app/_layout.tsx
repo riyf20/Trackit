@@ -36,7 +36,8 @@ export default function RootLayout() {
           >
             
             <Stack.Protected guard={loggedin && !onboarding}>
-              <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+              <Stack.Screen name="(tabs)" options={{ headerShown: false, title: "Home" }} />
+
               <Stack.Screen name="setting/details/accountInformation" options={{ headerShown: true,  title: 'Change Account Information', headerBackButtonDisplayMode:"minimal", headerTitleStyle: {fontSize: 20}  }} />
               <Stack.Screen name="setting/details/accountPassword" options={{ headerShown: true,  title: 'Change Password', headerBackButtonDisplayMode:"minimal", headerTitleStyle: {fontSize: 20}  }} />
 
@@ -48,6 +49,8 @@ export default function RootLayout() {
               <Stack.Screen name="setting/progress/stats" options={{ headerShown: true, title: 'Lifetime Stats', headerBackButtonDisplayMode:"minimal", headerTitleStyle: {fontSize: 20} }} />
 
               <Stack.Screen name="setting/systemSetting" options={{ headerShown: true, title: 'Settings', headerBackTitle: "Account", headerTitleStyle: {fontSize: 28} }} />
+              
+              <Stack.Screen name="contracts/createContract" options={{ headerShown: true, title: 'New Contract', headerBackButtonDisplayMode:"minimal", headerTitleStyle: {fontSize: 20} }} />
             </Stack.Protected>
             
             <Stack.Protected guard={!loggedin && onboarding}>

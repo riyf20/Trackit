@@ -39,6 +39,9 @@ type UserState = {
 
     invitesCount: number;
     updateInvitescount: (newCount:number) => void;
+
+    contractCardCompact: boolean;
+    updateContractCard: (contractCardCompact:boolean) => void;
 }
 
 type logInProps = {
@@ -71,6 +74,7 @@ export const useAuthStore = create(
             profilePictureFileId: "",
             profilePictureFileUrl: "",
             invitesCount: 0,
+            contractCardCompact: true,
             onboardingComplete: () => {
                 set((state) => {
                     return {
@@ -104,6 +108,7 @@ export const useAuthStore = create(
                         profilePictureFileId: profilePictureFileId,
                         profilePictureFileUrl: profilePictureFileUrl,
                         invitesCount: 0,
+                        contractCardCompact: true,
                     }
                 })
             },
@@ -186,7 +191,15 @@ export const useAuthStore = create(
                     }
                 })
             },
-        }),   
+            updateContractCard(contractCardCompact:boolean) {
+                set((state) => {
+                    return {
+                        ...state,
+                       contractCardCompact: contractCardCompact,
+                    }
+                })
+            }
+        }),  
     // second argument is where we are storing it
     {
         name: "auth-store",

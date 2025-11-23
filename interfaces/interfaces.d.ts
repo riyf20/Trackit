@@ -94,3 +94,66 @@ interface UserCardProps {
 interface UserCardMenuProps {
     handleUnfriend: () => void;
 }
+
+interface HeaderProps {
+    parent:string
+}
+
+interface Page1Props {
+    page: number,
+    shown: boolean,
+    habitName: string,
+    setHabitName: (args0:string) => void,
+    selectedEmoji: string,
+    setSelectedEmoji: (args0:string) => void,
+}
+interface Page2Props {
+    page: number,
+    shown: boolean,
+    frequency: string, 
+    setFrequency: (args0:string) => void, 
+    count: number, 
+    setCount: (args0:number) => void, 
+    duration: string, 
+    setDuration: (args0:string) => void,
+    endDate: string, 
+    setEndDate: (args0:string) => void,   
+}
+
+interface Page4Props {
+    selectedEmoji: string,
+    habitName: string,
+    frequency:string,
+    count: number,
+    duration: string,
+    endDate: string,
+}
+
+interface Contract {
+    Username: string,
+    User_ID: string, 
+    Habit_Name: string,
+    Habit_Icon: string,
+    Frequency: string,
+    Count: number,
+    Duration: string,
+    Expiration: string,
+    Difficulty: string,
+    Streak: number,
+    Total_Days: number,
+    $id: string,
+}
+
+interface ContractCardProps {
+    contract: Contract,
+}
+
+interface ContractFilterMenuProps {
+    tab: string,
+}
+
+interface PercentageTextProps {
+    percentage: nunber, 
+    streak: number, 
+    total: number,
+}

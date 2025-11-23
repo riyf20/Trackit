@@ -7,7 +7,7 @@ export type ThemedTextProps = TextProps & {
   darkColor?: string;
   type?: 'default' | 'title' | 'defaultSemiBold' | 'subtitle' | 'link' | 
   'onboarding' | 'onboardingMain' | 'settingSubheading' | 'settingSuboptions' 
-  | 'systemSettingOptions' | 'systemSettingSubtitle';
+  | 'systemSettingOptions' | 'systemSettingSubtitle' | 'difficultyTitle' | 'difficultySubtitle' | 'difficultyHeader';
 };
 
 export function ThemedText({
@@ -34,6 +34,9 @@ export function ThemedText({
         type === 'settingSuboptions' ? styles.settingSuboptions: undefined,
         type === 'systemSettingOptions' ? styles.systemSettingOptions: undefined,
         type === 'systemSettingSubtitle' ? styles.systemSettingSubtitle: undefined,
+        type === 'difficultyTitle' ? styles.difficultyTitle: undefined,
+        type === 'difficultySubtitle' ? styles.difficultySubtitle: undefined,
+        type === 'difficultyHeader' ? styles.difficultyHeader: undefined,
         style,
       ]}
       {...rest}
@@ -90,5 +93,17 @@ const styles = StyleSheet.create({
   systemSettingSubtitle: {
     fontSize: 14,
     fontWeight: 'light'
+  },
+  difficultyTitle: {
+    fontSize: 16,
+    fontWeight: 'bold'
+  },
+  difficultySubtitle: {
+    fontSize: 16,
+    fontWeight: 'light',
+  },
+  difficultyHeader: {
+    fontSize: 16,
+    fontWeight: 'bold',
   }
 });
