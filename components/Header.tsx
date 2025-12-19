@@ -8,6 +8,7 @@ import { useThemeColor } from '@/hooks/use-theme-color';
 import { router } from 'expo-router';
 import * as Haptics from 'expo-haptics';
 import { useAuthStore } from '@/utils/authStore';
+import ToastAlert from './ToastAlert';
 
 
 // Dynamic header for main tab pages
@@ -33,16 +34,20 @@ const Header = ({parent}:HeaderProps) => {
     const [compact, setCompact] = useState(contractCardCompact);
     const [detailed, setDetailed] = useState(!contractCardCompact);
 
+    const [activeView, setActiveView] = useState(contractCardCompact ? 'compact' : 'detailed')
+
     // Effect handler for contract card view
     const handleCompactSwitch = () => {
         Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
         setCompact(true);
         setDetailed(false);
+        setActiveView('compact')
     }
     const handleDetailedSwitch = () => {
         Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
         setDetailed(true);
         setCompact(false);
+        setActiveView('detailed')
     }
 
     // Makes sure to save the card preferance
@@ -82,7 +87,6 @@ const Header = ({parent}:HeaderProps) => {
             </Pressable>
 
             : parent === 'Contracts' ?
-                // { TO DO: Toast or message when changing between either modes */}
                 <View className={`flex flex-row absolute top-[-4px] right-[0px] ${theme==='#ECEDEE' ? 'bg-white/20' : 'bg-black/20'} py-[2px] px-[2px] gap-[4px] rounded-full`}>
                     <Pressable 
                         className={`border-2 border-transparent rounded-full p-[5px] ${compact ? (theme==='#ECEDEE' ? 'bg-white/20' : 'bg-black/20') : 'bg-transparent' } `}
@@ -96,6 +100,7 @@ const Header = ({parent}:HeaderProps) => {
                     >
                         <IconSymbol name={detailed ? 'rectangle.stack.fill' : 'rectangle.stack'} size={28} color={theme==='#ECEDEE' ? 'white' : 'black'} style={{transform: [{rotate: '180deg'}]}}/>
                     </Pressable>
+                    <ToastAlert parent={'contractHeader'} card={activeView}/>
                 </View>
             :
             <></>
@@ -133,6 +138,7 @@ const Header = ({parent}:HeaderProps) => {
                     >
                         <IconSymbol name={detailed ? 'rectangle.stack.fill' : 'rectangle.stack'} size={28} color={theme==='#ECEDEE' ? 'white' : 'black'} style={{transform: [{rotate: '180deg'}]}}/>
                     </Pressable>
+                    <ToastAlert parent={'contractHeader'} card={activeView}/>
                 </View>
             :
             <></>

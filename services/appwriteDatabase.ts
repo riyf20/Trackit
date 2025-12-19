@@ -252,6 +252,7 @@ export const addUserContract = async (username:string, userid:string, habitName:
             "Expiration": expiration,
             "Difficulty": difficulty, 
             "Total_Days": totalDays,
+            "Active": true,
         },
     })
 

@@ -1,9 +1,7 @@
 import { View, Text } from 'react-native'
 import React from 'react'
 import { ThemedText } from '../themed-text'
-import { GlassView } from 'expo-glass-effect'
 import { useThemeColor } from '@/hooks/use-theme-color'
-import { isLiquidGlassAvailable } from 'expo-glass-effect';
 import { BlurView } from 'expo-blur';
 
 // [Create Contract | Page 4] - Review page of all contract information
@@ -24,28 +22,19 @@ const Page4 = ({selectedEmoji, habitName, frequency, count, duration, endDate}:P
             <View className='w-[90%] mt-[40px]'>
                 <ThemedText type='difficultyTitle'>Your habit and icon </ThemedText>
                     <View className='flex flex-row ml-[16px] my-[12px] gap-[12px] items-center '>
-                        {/* Renders Liquid Glass if compatible otherwise Blurview */}
-                        {isLiquidGlassAvailable() ?
-                            <GlassView 
-                                style={{width: 50, height: 50, borderRadius: 16, justifyContent: 'center', alignItems: 'center'}}
-                                tintColor='gray'
+
+                        <View
+                            className='overflow-hidden rounded-2xl'
+                        >
+                            <BlurView
+                                intensity={100} 
+                                tint={`${theme==='#ECEDEE' ? 'dark' : 'light'}`}
+                                className='w-[50px] h-[50px] justify-center items-center'
                             >
                                 <Text className='text-[28px]'>{selectedEmoji}</Text>
-                            </GlassView>
-                        :
-                            <View
-                                className='overflow-hidden rounded-2xl'
-                            >
-                                <BlurView
-                                    intensity={100} 
-                                    tint={`${theme==='#ECEDEE' ? 'dark' : 'light'}`}
-                                    className='w-[50px] h-[50px] justify-center items-center'
-                                >
-                                    <Text className='text-[28px]'>{selectedEmoji}</Text>
-                                </BlurView>   
-                            </View>
+                            </BlurView>   
+                        </View>
                             
-                        }
                         <ThemedText>{habitName+ ' '}{frequency==='Weekly' ? count+'x/week' : 'daily'}</ThemedText>
                     </View>
                     

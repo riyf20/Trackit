@@ -129,6 +129,7 @@ const account = () => {
           marginTop: 120,}}
       >
 
+        {/* TO DO: Implement a refetch once page is loaded back (refreshing user data) */}
         {/* Account card component */}
         <View
           className="flex h-[fit] items-center mt-[20px] mb-[-70%]"

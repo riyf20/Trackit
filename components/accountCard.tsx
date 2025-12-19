@@ -1,20 +1,14 @@
 import { View, Image, Pressable, Platform } from 'react-native'
 import React, { useCallback, useEffect, useState } from 'react'
-import { LinearGradient } from 'expo-linear-gradient';
 import { images } from '@/constants/images'
 import { ThemedText } from '@/components/themed-text'
 import { useAuthStore } from '@/utils/authStore';
 import { router, useFocusEffect } from 'expo-router';
 import Animated, { useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
-import { GlassView } from 'expo-glass-effect';
+import { BlurView } from 'expo-blur';
 
 // Account card component to show user data
 const AccountCard = ({setExpanded}:AccountCardProps) => {
-
-  // Checks OS version to use compatible components
-  const iosVersion = Platform.Version;
-  const iosVersionNumber = typeof iosVersion === 'string' ? parseInt(iosVersion, 10) : iosVersion;
-  const [useGlass, setUseGlass] = useState(typeof iosVersionNumber === 'number' && iosVersionNumber >= 26);
 
   // Saved state variables
   const {username, profilePictureFileId, profilePictureFileUrl, defaultPicture, getDefaultPicture, getProfileFileId, getProfileFileUrl} = useAuthStore()
@@ -93,38 +87,19 @@ const AccountCard = ({setExpanded}:AccountCardProps) => {
   return (
     <View className='w-[90%] shadow-lg shadow-black/40'>
         {/* Pressable for the stat card */}
-        <Pressable className='shadow-lg shadow-black/40' onPress={showInformation}>
-        
-        {useGlass ?
-          // Uses glass if on ios 26 
-          <GlassView
-            style={{borderRadius: 16, marginTop: 8,}}
+          <BlurView
+            style={{borderRadius: 16, marginTop: 8, overflow: 'hidden'}}
           >
-            <Image
-              source={basePicture ? images.profile : {uri: url}}
-              className='w-[125px] h-[125px] rounded-full self-center my-[12px]'
-              resizeMode="cover"
-            />
-            <ThemedText type='title' className='self-center my-[12px]'>{username}</ThemedText> 
-          </GlassView>
+            <Pressable className='shadow-lg shadow-black/40' onPress={showInformation}>
+              <Image
+                source={basePicture ? images.profile : {uri: url}}
+                className='w-[125px] h-[125px] rounded-full self-center my-[12px]'
+                resizeMode="cover"
+              />
+              <ThemedText type='title' className='self-center my-[12px]'>{username}</ThemedText> 
+            </Pressable>
+          </BlurView>
 
-        :
-          // Will use a gradient on other software
-          <LinearGradient
-            colors={['#4c669f', '#3b5998', '#192f6a']}
-            style={{borderRadius: 16, marginTop: 8,}}
-            start={{x:0, y:1}}
-            end={{x:1, y:0}}
-          >
-            <Image
-              source={basePicture ? images.profile : {uri: url}}
-              className='w-[125px] h-[125px] rounded-full self-center my-[12px]'
-              resizeMode="cover"
-            />
-            <ThemedText type='title' className='self-center my-[12px]'>{username}</ThemedText> 
-          </LinearGradient>
-        }
-        </Pressable>
         
         <Animated.View style={informationStyle} className='bg-slate-600 h-[44%] rounded-[16px] relative top-[-44%] -z-10 shadow-lg shadow-black/40'>
 

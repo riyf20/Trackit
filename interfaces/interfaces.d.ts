@@ -64,14 +64,6 @@ interface AccountCardProps {
     setExpanded: (args0: boolean) => void
 }
 
-// Can be used later...
-// interface ImageItem {
-//     filePath: string;
-//     fileUri: string;
-//     base64: string;
-//     id?:number
-// }
-
 interface UserSearchCardProps {
     user:User,
     usersFriends?: string[]
@@ -142,18 +134,41 @@ interface Contract {
     Streak: number,
     Total_Days: number,
     $id: string,
+    $createdAt: string,
+    Active: boolean,
 }
 
 interface ContractCardProps {
     contract: Contract,
 }
 
-interface ContractFilterMenuProps {
-    tab: string,
+interface FilterMenuProps {
+    parent: string,
+    changeFilter: (args0:string) => void
+    menuOpen: boolean,
+    setMenuOpen: (args0:boolean) => void
 }
 
 interface PercentageTextProps {
     percentage: nunber, 
     streak: number, 
     total: number,
+}
+
+interface ToastAlertProps {
+    parent: string,
+    card: string,
+}
+
+interface ContractPillProps {
+    parent: string, 
+    value: string | number | undefined,
+}
+
+interface FilterMenuOptionProps {
+    icon: SFSymbols7_0;
+    label: string;
+    onPress: () => void;
+    active: boolean;
+    setMenuOpen: (args0:boolean) => void;
 }

@@ -12,8 +12,9 @@ import { GlassView, isLiquidGlassAvailable } from 'expo-glass-effect'
 import { useAuthStore } from '@/utils/authStore'
 import { searchUserContract } from '@/services/appwriteDatabase'
 import ContractCard from '@/components/ContractCard'
-import ContractFilterMenu from '@/components/ContractFilterMenu'
+import FilterMenu from '@/components/FilterMenu'
 import { BlurView } from 'expo-blur'
+import Animated, { FadeInDown, FadeOutUp, Layout } from 'react-native-reanimated'
 
 
 // [Contracts Tab] - All user contracts
@@ -22,6 +23,7 @@ const contracts = () => {
   // On device variables
   const {username, userId} = useAuthStore()
 
+  // TO DO: Move theme into the authstore [will help for dark/light mode later on]
   const theme = useThemeColor({}, 'text');
 
   // Loading and empty state for contracts
@@ -40,8 +42,6 @@ const contracts = () => {
   // Search query for contracts
   const [query, setQuery] = useState('')
 
-  {/* TO DO: Link search query to the fetch */}
-
   const fetchContracts = async () => {
     // Sets loading
     setFetching(true)
@@ -56,7 +56,7 @@ const contracts = () => {
       }
       setFetching(false)
     } catch (error:any) {
-      console.log("Error while fetching contracts")
+      console.log("[Contracts.tsx] : Error while fetching contracts")
       console.log(error)
       setFetching(false)
     }
@@ -69,10 +69,105 @@ const contracts = () => {
   // Refresh variable 
   const [refreshing, setRefreshing] = useState(false);
 
+  // Filter titles [Will switch to selected option's name | Used for fetching as well]
+  const [sortFilter, setSortFilter] = useState('')
+  const [statusFilter, setStatusFilter] = useState('Active')
+  const [difficultyFilter, setDifficultyFilter] = useState('')
+
+  // Will do these calculations if the dependencies are changed
+  const visibleContracts = React.useMemo(() => {
+
+    // Store all contracts
+    let result = [...contracts];
+
+    // Search filter
+    if (query.trim()) {
+      const search = query.toLowerCase();
+      result = result.filter((contract:Contract) =>
+        contract.Habit_Name.toLowerCase().includes(search)
+      );
+    }
+
+    // Difficulty filter
+    if (difficultyFilter) {
+      result = result.filter(
+        (contract:Contract) => contract.Difficulty === difficultyFilter
+      );
+    }
+
+    // Status filter | Active
+    if(statusFilter==='Active') {
+      result = result.filter(
+        (contract:Contract) => contract.Active 
+      );
+    }
+
+    // Status filter | Past
+    if(statusFilter==='Past') {
+      result = result.filter(
+        (contract:Contract) => !contract.Active 
+      );
+    }
+
+    // Sort filter | Newest
+    if (sortFilter === 'Newest First') {
+      result.sort(
+        (a:Contract, b:Contract) =>
+          new Date(b.$createdAt).getTime() -
+          new Date(a.$createdAt).getTime()
+      );
+    }
+
+    // Sort filter | Oldest
+    if (sortFilter === 'Oldest First') {
+      result.sort(
+        (a:Contract, b:Contract) =>
+          new Date(a.$createdAt).getTime() -
+          new Date(b.$createdAt).getTime()
+      );
+    }
+
+    // Sort filter | Ending soon
+    if (sortFilter === 'Ending Soon') {
+      result.sort(
+        (a:Contract, b:Contract) =>
+          new Date(a.Expiration).getTime() -
+          new Date(b.Expiration).getTime()
+      );
+    }
+
+    return result;
+  }, [contracts, query, difficultyFilter, sortFilter, statusFilter]);
+
+  // Filter's open states | Will be used to create an overlay to close on background tap
+  const [sortFilterOpen, setSortFilterOpen] = useState(false); 
+  const [statusFilterOpen, setStatusFilterOpen] = useState(false); 
+  const [difficultyfilterOpen, setDifficultyFilterOpen] = useState(false); 
 
   return (
     <ThemedView
       className="h-full flex flex-1 items-center">
+
+        {/* Used as overlay to ensure any other presses closes the filter window */}
+        { (sortFilterOpen || statusFilterOpen || difficultyfilterOpen) &&
+          <Pressable
+            style={{
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              zIndex: 50,
+              width: '100%',
+              height: '100%',
+            }}
+            onPress={() => {
+              setSortFilterOpen(false)
+              setStatusFilterOpen(false)
+              setDifficultyFilterOpen(false)
+            }}
+          />
+        }
 
         {/* Search bar */}
         <View className="flex w-[88%] mt-[130px]">
@@ -105,17 +200,17 @@ const contracts = () => {
         {/* Filter bar */}
         <View className='w-[88%] mt-[12px] flex flex-row justify-evenly'>
             
-          {/* TO DO: Link filters to work with searching */}
-          <ContractFilterMenu tab={'Sort By'}/>
-          <ContractFilterMenu tab={'Status'}/>
-          <ContractFilterMenu tab={'Difficulty'}/>
+          {/* TO DO: Add coloring to the filter options or icons */}
+          <FilterMenu parent={'Sort By'} changeFilter={setSortFilter} menuOpen={sortFilterOpen} setMenuOpen={setSortFilterOpen}/>
+          <FilterMenu parent={'Status'} changeFilter={setStatusFilter} menuOpen={statusFilterOpen} setMenuOpen={setStatusFilterOpen} />
+          <FilterMenu parent={'Difficulty'} changeFilter={setDifficultyFilter} menuOpen={difficultyfilterOpen} setMenuOpen={setDifficultyFilterOpen} />
 
         </View>
       
         {/* Scrollview of search results */}
         <View className='mt-[12px] w-[100%] h-[76%] flex items-center'>
           <ScrollView
-            contentContainerStyle={{width: '88%', marginBottom: 100, paddingBottom: 150, display: 'flex'}}
+            contentContainerStyle={{width: '100%', marginBottom: 100, paddingBottom: 150, display: 'flex',}}
             // Refresh function to refetch content
             refreshControl={
               <RefreshControl refreshing={refreshing} onRefresh={fetchContracts} />
@@ -146,10 +241,24 @@ const contracts = () => {
                 </View>
 
               :!fetching && !empty &&
-                // Card view of contracts
-                contracts.map((contract: Contract, index) => (
-                  <ContractCard key={index} contract={contract}/>
-                ))
+
+                (query.trim() || sortFilter || statusFilter || difficultyFilter) && visibleContracts.length===0 ?
+                  (
+                    // Shows card if not matching contracts
+                    <Animated.View layout={Layout.springify()} entering={FadeInDown.duration(200)} exiting={FadeOutUp.duration(150)} className='flex flex-row items-center justify-center'>
+                      <View className='flex-row gap-2 border-white border-2 rounded-2xl p-4 w-[88%] flex items-center justify-center'>
+                        <IconSymbol name={'exclamationmark.circle'} size={22} color={theme === "#ECEDEE" ? "white" : "black"}/>
+                        <ThemedText type='difficultyTitle'>No Contracts found...</ThemedText>
+                      </View>
+                    </Animated.View>
+                  ) 
+                  :
+                    (
+                      // Card view of contracts
+                      visibleContracts.map((contract: Contract) => (
+                        <ContractCard key={contract.$id} contract={contract}/>
+                      ))
+                    )
             }
           </ScrollView>
         </View>

@@ -84,6 +84,7 @@ const systemSetting = () => {
                 <Button variant="solid" size="md" action='negative' className='mt-[12px] rounded-full' style={{borderRadius: 99}} onPressIn={haptic()} onPress={() => {handleLogOutUser()}}>
                     <ButtonText color='black'>Log Out</ButtonText>
                 </Button>
+                <ThemedText className='text-center mt-[16px]'>Version 1.6</ThemedText>
 
         </ScrollView>
     </ThemedView>

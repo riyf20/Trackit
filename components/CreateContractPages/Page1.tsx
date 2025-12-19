@@ -6,8 +6,6 @@ import { ThemedText } from '../themed-text';
 import { Input, InputField, Button, ButtonText } from '@gluestack-ui/themed';
 import { IconSymbol } from '../ui/icon-symbol';
 import EmojiPicker, { emojiData } from '@hiraku-ai/react-native-emoji-picker';
-import { GlassView } from 'expo-glass-effect';
-import { isLiquidGlassAvailable } from 'expo-glass-effect';
 import { BlurView } from 'expo-blur';
 import * as Haptics from 'expo-haptics';
 
@@ -100,25 +98,17 @@ const Page1 = ({page, shown, habitName, setHabitName, selectedEmoji, setSelected
             <Animated.View style={block2Style} className={`w-full flex items-center rounded-xl top-[-22px] ${theme==='#ECEDEE' ? 'bg-white/20' : 'bg-gray-400'} `}>
                 <View className='w-[90%] mt-[40px] flex items-center justify-center'>
                     <Animated.View style={block2IconStyle}>
-                        {/* Renders Liquid Glass if compatible otherwise Blurview */}
-                        {isLiquidGlassAvailable() ?
-                            <GlassView 
-                                style={{width: 75, height: 75, borderRadius: 16, justifyContent: 'center', alignItems: 'center'}}
-                                tintColor='gray'
+
+                        <View className='w-[75px] h-[75px] rounded-2xl justify-center items-center overflow-hidden'>
+                            <BlurView
+                                intensity={100} 
+                                tint={`${theme==='#ECEDEE' ? 'dark' : 'light'}`}
+                                className='flex flex-1 h-full w-full items-center justify-center'
                             >
                                 <Text className='text-[48px]'>{selectedEmoji}</Text>
-                            </GlassView>
-                            :
-                            <View className='w-[75px] h-[75px] rounded-2xl justify-center items-center overflow-hidden'>
-                                <BlurView
-                                    intensity={100} 
-                                    tint={`${theme==='#ECEDEE' ? 'dark' : 'light'}`}
-                                    className='flex flex-1 h-full w-full items-center justify-center'
-                                >
-                                    <Text className='text-[48px]'>{selectedEmoji}</Text>
-                                </BlurView>
-                            </View>
-                        }
+                            </BlurView>
+                        </View>
+
                     </Animated.View>
                     <Animated.View style={block2ButtonStyle}>
                         <Button className='mt-[12px] flex gap-[2px]' onPress={() => setEmojiPickerVisible(true)} onPressIn={() => {Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium)}}>
@@ -126,6 +116,7 @@ const Page1 = ({page, shown, habitName, setHabitName, selectedEmoji, setSelected
                             <ButtonText>Edit</ButtonText>
                         </Button>
                     </Animated.View>
+                    {/* TO DO: Optimize picker opening to improve performance */}
                     {/* Edit button triggers EmojiPicker component */}
                     <EmojiPicker
                         onEmojiSelect={(emoji) => {

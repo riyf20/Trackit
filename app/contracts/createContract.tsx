@@ -9,18 +9,16 @@ import { router } from 'expo-router'
 import Page1 from '@/components/CreateContractPages/Page1'
 import Page2 from '@/components/CreateContractPages/Page2'
 import Page3 from '@/components/CreateContractPages/Page3'
-import { GlassView } from 'expo-glass-effect'
 import Page4 from '@/components/CreateContractPages/Page4'
 import Animated, { FadeIn, FadeInDown, FadeInUp } from 'react-native-reanimated'
-import { isLiquidGlassAvailable } from 'expo-glass-effect';
 import { BlurView } from 'expo-blur'
 import { useAuthStore } from '@/utils/authStore'
 import { addUserContract } from '@/services/appwriteDatabase'
 import * as Haptics from 'expo-haptics';
 
 
-// [Create Contract Page] - Users can make new habit contracts
 {/* TO DO: Add modal confirming if users hit back button (at top) or cancel if they want to lose changes */}
+// [Create Contract Page] - Users can make new habit contracts
 const createContract = () => {
 
     // On device variables
@@ -109,7 +107,7 @@ const createContract = () => {
             // Page 5 is a confirmation page | Redirects to the homepage
             setPage(5)
         } catch (error:any) {
-            console.log("Error during contract submission")
+            console.log("[createContract.tsx] : Error during contract submission")
             console.log(error)
             console.log(error.message)
         }
@@ -134,27 +132,6 @@ const createContract = () => {
             <View className='flex h-[70%] justify-center items-center'>
                 <Animated.View entering={FadeIn.springify().duration(1200)}>
                     {/* Confirmation modal | Renders Liquid Glass is compatible otherwise Blurview */}
-                    {isLiquidGlassAvailable() ?
-                        <GlassView
-                            style={{display: 'flex', padding: 28, borderRadius: 16,}}
-                        >
-                            <Animated.View entering={FadeInUp.springify().duration(1400)}>
-                                <ThemedText type="title" className="mb-[12px]">Congratulations!</ThemedText>
-                            </Animated.View>
-
-                            <Animated.View entering={FadeIn.springify().delay(150).duration(1600)}>
-                                <ThemedText type="defaultSemiBold" darkColor="gray">
-                                    The new you is one step closer.
-                                </ThemedText>
-                            </Animated.View>
-
-                            <Animated.View entering={FadeIn.springify().delay(300).duration(1800)}>
-                                <ThemedText type="defaultSemiBold" darkColor="gray">
-                                    Let's get started!
-                                </ThemedText>
-                            </Animated.View>
-                        </GlassView>
-                        :
                         <View className='overflow-hidden rounded-2xl'>
                             <BlurView
                                 className='flex p-[28px]'
@@ -178,7 +155,6 @@ const createContract = () => {
                                 </Animated.View>
                             </BlurView>
                         </View>
-                    }
                 </Animated.View>
                 {/* Button redirecting to contracts page */}
                 <Animated.View entering={FadeInDown.springify().delay(1600).duration(800)}>

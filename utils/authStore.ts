@@ -42,6 +42,9 @@ type UserState = {
 
     contractCardCompact: boolean;
     updateContractCard: (contractCardCompact:boolean) => void;
+
+    contractDetails: Contract | null;
+    updateContractDetails: (newContract:Contract) => void;
 }
 
 type logInProps = {
@@ -75,6 +78,7 @@ export const useAuthStore = create(
             profilePictureFileUrl: "",
             invitesCount: 0,
             contractCardCompact: true,
+            contractDetails: null,
             onboardingComplete: () => {
                 set((state) => {
                     return {
@@ -109,6 +113,7 @@ export const useAuthStore = create(
                         profilePictureFileUrl: profilePictureFileUrl,
                         invitesCount: 0,
                         contractCardCompact: true,
+                        contractDetails: null,
                     }
                 })
             },
@@ -196,6 +201,14 @@ export const useAuthStore = create(
                     return {
                         ...state,
                        contractCardCompact: contractCardCompact,
+                    }
+                })
+            },
+            updateContractDetails(newContract:Contract) {
+                set((state) => {
+                    return {
+                        ...state,
+                       contractDetails: newContract,
                     }
                 })
             }

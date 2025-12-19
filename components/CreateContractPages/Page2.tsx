@@ -101,7 +101,7 @@ const Page2 = ({page, shown, frequency, setFrequency, count, setCount, duration,
         if (!duration) return;
 
         const now = new Date();
-        let date;
+        let date: Date | undefined;
 
         if (duration === "1 Week") {
             date = addWeeks(now, 1);
@@ -111,8 +111,9 @@ const Page2 = ({page, shown, frequency, setFrequency, count, setCount, duration,
             date = addMonths(now, 3);
         }
 
+        if(!date) return;
         // Formats and stores end date
-        setEndDate(format(date!, 'MMM dd, yyyy'))
+        setEndDate(date.toISOString())
     }, [duration]);
     
     
@@ -205,9 +206,9 @@ const Page2 = ({page, shown, frequency, setFrequency, count, setCount, duration,
                         </SelectPortal>
                     </Select>
                     {/* Animated end date */}
-                    { duration.trim() &&
+                    { endDate &&
                         <Animated.View entering={FadeIn.delay(400).duration(400)}>
-                            <ThemedText className='mt-[6px] ml-[6px]' type='defaultSemiBold'>Est. End Date: <ThemedText type='subtitle'>{endDate}</ThemedText></ThemedText>
+                            <ThemedText className='mt-[6px] ml-[6px]' type='defaultSemiBold'>Est. End Date: <ThemedText type='subtitle'>{format(new Date(endDate), 'MMM dd, yyyy')}</ThemedText></ThemedText>
                         </Animated.View>
                     }
                 </Animated.View>

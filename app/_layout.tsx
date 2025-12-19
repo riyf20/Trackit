@@ -17,7 +17,7 @@ export default function RootLayout() {
 
   const colorScheme = useColorScheme();
 
-  const {loggedin, onboarding} = useAuthStore();
+  const {loggedin, onboarding, contractDetails} = useAuthStore();
 
   const theme = useThemeColor({}, 'text');
 
@@ -51,6 +51,8 @@ export default function RootLayout() {
               <Stack.Screen name="setting/systemSetting" options={{ headerShown: true, title: 'Settings', headerBackTitle: "Account", headerTitleStyle: {fontSize: 28} }} />
               
               <Stack.Screen name="contracts/createContract" options={{ headerShown: true, title: 'New Contract', headerBackButtonDisplayMode:"minimal", headerTitleStyle: {fontSize: 20} }} />
+              <Stack.Screen name="contracts/[id]" options={{ headerShown: true, title: contractDetails?.Habit_Name, headerBackButtonDisplayMode:"minimal", headerTitleStyle: {fontSize: 20} }} />
+
             </Stack.Protected>
             
             <Stack.Protected guard={!loggedin && onboarding}>

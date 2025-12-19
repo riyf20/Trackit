@@ -21,7 +21,7 @@ import { addUserTable } from '@/services/appwriteDatabase';
 const onboardingMain = () => {
 
   // Debug switch
-  const debug = true;
+  const debug = false;
 
   const {onboardingReset, logIn} = useAuthStore()
 
