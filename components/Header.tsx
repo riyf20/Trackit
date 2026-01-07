@@ -14,9 +14,7 @@ import ToastAlert from './ToastAlert';
 // Dynamic header for main tab pages
 const Header = ({parent}:HeaderProps) => {
 
-    const {updateContractCard, contractCardCompact} = useAuthStore()
-
-    const theme = useThemeColor({}, 'text');
+    const {updateContractCard, contractCardCompact, logsCardCompact, updateLogsCard, theme} = useAuthStore()
 
     // Pressed state for the setting icon at header [redirects to systems setting page]
     const [iconPressed, setIconPressed] = useState(false);  
@@ -31,10 +29,10 @@ const Header = ({parent}:HeaderProps) => {
     const [title, setTitle] = useState(parent)
 
     // View of the contract cards
-    const [compact, setCompact] = useState(contractCardCompact);
-    const [detailed, setDetailed] = useState(!contractCardCompact);
+    const [compact, setCompact] = useState(parent==='Contracts' ? contractCardCompact : parent==='Logs' ? logsCardCompact : true);
+    const [detailed, setDetailed] = useState(parent==='Contracts' ? !contractCardCompact : parent==='Logs' ? !logsCardCompact : false);
 
-    const [activeView, setActiveView] = useState(contractCardCompact ? 'compact' : 'detailed')
+    const [activeView, setActiveView] = useState( (contractCardCompact) || (logsCardCompact) ? 'compact' : 'detailed')
 
     // Effect handler for contract card view
     const handleCompactSwitch = () => {
@@ -53,11 +51,16 @@ const Header = ({parent}:HeaderProps) => {
     // Makes sure to save the card preferance
     useEffect(() => {
         
+        if (parent==='Contracts') {
+            updateContractCard(compact);
+        } else if (parent==='Logs') {
+            updateLogsCard(compact)
+        }
         // Stores only the truthy value of compact
-        updateContractCard(compact);
     }, [compact, detailed])
 
   
+    // TO DO: Animate compact/detailed button being switched
   return (
 
     isLiquidGlassAvailable() ? 
@@ -72,35 +75,38 @@ const Header = ({parent}:HeaderProps) => {
         justifyContent: 'center',
         borderBottomLeftRadius: 10,
         borderBottomRightRadius: 10,
+        overflow: 'hidden',
+        // backgroundColor: '#ECEDEE'
         }}
+        glassEffectStyle={'clear'}
     >
         <ThemedText type='title' className='items-left justify-start absolute ml-[30px] mt-[75px]'>{title}</ThemedText>
         
-        <View className={`items-right justify-end absolute top-[74px] right-0 mr-[30px] border-2 border-transparent rounded-full p-[3px] ${iconPressed ? (theme==='#ECEDEE' ? 'bg-white/20' : 'bg-black/20') : 'bg-transparent' } `}>
+        <View className={`items-right justify-end absolute top-[74px] right-0 mr-[30px] border-2 border-transparent rounded-full p-[3px] ${iconPressed ? (theme==='dark' ? 'bg-white/20' : 'bg-black/20') : 'bg-transparent' } `}>
         {parent === 'Account' ?
             <Pressable
                 onPressIn={handleIconPressed}
                 onPressOut={() => {setIconPressed(false)}}
                 onPress={() => {router.push('/setting/systemSetting')}}
             >
-                <IconSymbol name='gear' size={35} color={theme}/>
+                <IconSymbol name='gear' size={35} color={theme==='dark' ? 'white' : 'black'}/>
             </Pressable>
 
-            : parent === 'Contracts' ?
-                <View className={`flex flex-row absolute top-[-4px] right-[0px] ${theme==='#ECEDEE' ? 'bg-white/20' : 'bg-black/20'} py-[2px] px-[2px] gap-[4px] rounded-full`}>
+            : parent === 'Contracts' || parent==='Logs' ?
+                <View className={`flex flex-row absolute top-[-4px] right-[0px] ${theme==='dark' ? 'bg-white/20' : 'bg-black/20'} py-[2px] px-[2px] gap-[4px] rounded-full`}>
                     <Pressable 
-                        className={`border-2 border-transparent rounded-full p-[5px] ${compact ? (theme==='#ECEDEE' ? 'bg-white/20' : 'bg-black/20') : 'bg-transparent' } `}
+                        className={`border-2 border-transparent rounded-full p-[5px] ${compact ? (theme==='dark' ? 'bg-white/20' : 'bg-black/20') : 'bg-transparent' } `}
                         onPress={handleCompactSwitch}    
                     >
-                        <IconSymbol name={compact ? 'rectangle.fill' : 'rectangle'} size={28} color={theme==='#ECEDEE' ? 'white' : 'black'} />
+                        <IconSymbol name={compact ? 'rectangle.fill' : 'rectangle'} size={28} color={theme==='dark' ? 'white' : 'black'} />
                     </Pressable>
                     <Pressable 
-                        className={`border-2 border-transparent rounded-full p-[5px] ${detailed ? (theme==='#ECEDEE' ? 'bg-white/20' : 'bg-black/20') : 'bg-transparent' } `}
+                        className={`border-2 border-transparent rounded-full p-[5px] ${detailed ? (theme==='dark' ? 'bg-white/20' : 'bg-black/20') : 'bg-transparent' } `}
                         onPress={handleDetailedSwitch}
                     >
-                        <IconSymbol name={detailed ? 'rectangle.stack.fill' : 'rectangle.stack'} size={28} color={theme==='#ECEDEE' ? 'white' : 'black'} style={{transform: [{rotate: '180deg'}]}}/>
+                        <IconSymbol name={detailed ? 'rectangle.stack.fill' : 'rectangle.stack'} size={28} color={theme==='dark' ? 'white' : 'black'} style={{transform: [{rotate: '180deg'}]}}/>
                     </Pressable>
-                    <ToastAlert parent={'contractHeader'} card={activeView}/>
+                    <ToastAlert parent={parent} card={activeView}/>
                 </View>
             :
             <></>
@@ -110,35 +116,35 @@ const Header = ({parent}:HeaderProps) => {
     :
     <BlurView
         intensity={30} 
-        tint={`${theme==='#ECEDEE' ? 'dark' : 'light'}`}
-        className='h-[13%] absolute top-0 left-0 w-full flex justify-center rounded-b-3xl'
+        tint={`${theme==='dark' ? 'dark' : 'light'}`}
+        className='h-[15%] absolute top-0 left-0 w-full flex justify-center rounded-b-3xl'
     >
         <ThemedText type='title' className='items-left justify-start absolute ml-[30px] mt-[75px]'>{title}</ThemedText>
         
-        <View className={`items-right justify-end absolute top-[74px] right-0 mr-[30px] border-2 border-transparent rounded-full p-[3px] ${iconPressed ? (theme==='#ECEDEE' ? 'bg-white/20' : 'bg-black/20') : 'bg-transparent' } `}>
+        <View className={`items-right justify-end absolute top-[78px] right-0 mr-[30px] border-2 border-transparent rounded-full p-[3px] ${iconPressed ? (theme==='dark' ? 'bg-white/20' : 'bg-black/20') : 'bg-transparent' } `}>
         {parent === 'Account' ?
             <Pressable
                 onPressIn={handleIconPressed}
                 onPressOut={() => {setIconPressed(false)}}
                 onPress={() => {router.push('/setting/systemSetting')}}
             >
-                <IconSymbol name='gear' size={35} color={theme}/>
+                <IconSymbol name='gear' size={35} color={theme==='dark' ? 'white' : 'black'}/>
             </Pressable>
-            : parent === 'Contracts' ?
-                <View className={`flex flex-row absolute top-[-4px] right-[0px] ${theme==='#ECEDEE' ? 'bg-white/20' : 'bg-black/20'}  py-[2px] px-[2px] gap-[4px] rounded-full`}>
+            : parent === 'Contracts' || parent==='Logs' ?
+                <View className={`flex flex-row absolute top-[-4px] right-[0px] ${theme==='dark' ? 'bg-white/20' : 'bg-black/20'}  py-[2px] px-[2px] gap-[4px] rounded-full`}>
                     <Pressable 
-                        className={`border-2 border-transparent rounded-full p-[5px] ${compact ? (theme==='#ECEDEE' ? 'bg-white/20' : 'bg-black/20') : 'bg-transparent' } `}
+                        className={`border-2 border-transparent rounded-full p-[5px] ${compact ? (theme==='dark' ? 'bg-white/20' : 'bg-black/20') : 'bg-transparent' } `}
                         onPress={handleCompactSwitch}    
                     >
-                        <IconSymbol name={compact ? 'rectangle.fill' : 'rectangle'} size={28} color={theme==='#ECEDEE' ? 'white' : 'black'} />
+                        <IconSymbol name={compact ? 'rectangle.fill' : 'rectangle'} size={28} color={theme==='dark' ? 'white' : 'black'} />
                     </Pressable>
                     <Pressable 
-                        className={`border-2 border-transparent rounded-full p-[5px] ${detailed ? (theme==='#ECEDEE' ? 'bg-white/20' : 'bg-black/20') : 'bg-transparent' } `}
+                        className={`border-2 border-transparent rounded-full p-[5px] ${detailed ? (theme==='dark' ? 'bg-white/20' : 'bg-black/20') : 'bg-transparent' } `}
                         onPress={handleDetailedSwitch}
                     >
-                        <IconSymbol name={detailed ? 'rectangle.stack.fill' : 'rectangle.stack'} size={28} color={theme==='#ECEDEE' ? 'white' : 'black'} style={{transform: [{rotate: '180deg'}]}}/>
+                        <IconSymbol name={detailed ? 'rectangle.stack.fill' : 'rectangle.stack'} size={28} color={theme==='dark' ? 'white' : 'black'} style={{transform: [{rotate: '180deg'}]}}/>
                     </Pressable>
-                    <ToastAlert parent={'contractHeader'} card={activeView}/>
+                    <ToastAlert parent={parent} card={activeView}/>
                 </View>
             :
             <></>

@@ -6,9 +6,10 @@ import { Button, ButtonText } from '@gluestack-ui/themed'
 import { useAuthStore } from '@/utils/authStore'
 import { acceptInviteTable, updateRequestedTable } from '@/services/appwriteDatabase'
 
+// Users card with dynamic friend state checking
 const UserSearchCard = ({user, usersFriends, usersRequested, usersInvites}:UserSearchCardProps) => {
 
-    const {username, userId} = useAuthStore();
+    const { userId} = useAuthStore();
 
     const[basePicture, setBasePicture] = useState(true);
 
@@ -64,10 +65,6 @@ const UserSearchCard = ({user, usersFriends, usersRequested, usersInvites}:UserS
 
     // Currently this component is only being used in search
   return (
-
-    // This will remove the currently logged in user from the search result
-    username!==user.User 
-    &&
     <View className='w-[90%] flex flex-row'>
         <View className='flex-1 flex-row gap-[12px]'>
             <Image

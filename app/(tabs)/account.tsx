@@ -1,14 +1,12 @@
-import { View, Pressable, ScrollView, Platform, Text } from 'react-native'
+import { View, Pressable, ScrollView } from 'react-native'
 import React, { useCallback, useEffect, useState } from 'react'
 import { ThemedView } from '@/components/themed-view'
 import { ThemedText } from '@/components/themed-text'
 import { IconSymbol } from '@/components/ui/icon-symbol'
-import { useThemeColor } from '@/hooks/use-theme-color';
 import AccountCard from '@/components/AccountCard'
 import { router, useFocusEffect } from 'expo-router'
 import { details, detailsRoutes, social, socialRoutes, 
   progress, progressRoutes } from '@/constants/settings'
-import * as Haptics from 'expo-haptics';
 import Animated, { useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated'
 import { useAuthStore } from '@/utils/authStore'
 import { getUserById } from '@/services/appwriteDatabase'
@@ -18,17 +16,7 @@ import Header from '@/components/Header'
 const account = () => {
   
   // On device variables
-  const { userId, updateInvitescount, invitesCount } = useAuthStore();
-
-  // Used to check if glass view (ios 26) can be used
-  const iosVersion = Platform.Version;
-  const iosVersionNumber = typeof iosVersion === 'string' ? parseInt(iosVersion, 10) : iosVersion;
-  const [useGlass, setUseGlass] = useState(typeof iosVersionNumber === 'number' && iosVersionNumber >= 26);
-
-  // Debug switch
-  const debug = false;
-
-  const theme = useThemeColor({}, 'text');
+  const { userId, updateInvitescount, invitesCount, theme } = useAuthStore();
 
   // Used for account details section [details holds the title | detailsRoutes hold the linked pages | these hold the pressed state]
   const [account1, setAccount1] = useState(false);
@@ -51,15 +39,6 @@ const account = () => {
 
   const progressStates = [progress1, progress2]
   const progressStatesSetter = [setProgress1, setProgress2]
-
-  // Pressed state for the setting icon at header [redirects to systems setting page]
-  const [iconPressed, setIconPressed] = useState(false);  
-
-  // Gives visual and haptic feedback when pressing the settings icon
-  const handleIconPressed = () => {
-    setIconPressed(true)
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-  }
 
   // State to hold if card was expanded
   const [expanded, setExpanded] = useState(false);
@@ -97,7 +76,7 @@ const account = () => {
       }
 
     } catch (error: any) {
-      console.log("Error fetching user's invites");
+      console.log("[Account.tsx]: Error fetching user's invites");
     }
   };
 
@@ -112,7 +91,6 @@ const account = () => {
   // On focus will refresh data from device storage
   useFocusEffect(
     useCallback(() => {
-      router.reload
       fetchData();
     }, [])
   );
@@ -129,7 +107,6 @@ const account = () => {
           marginTop: 120,}}
       >
 
-        {/* TO DO: Implement a refetch once page is loaded back (refreshing user data) */}
         {/* Account card component */}
         <View
           className="flex h-[fit] items-center mt-[20px] mb-[-70%]"
@@ -143,7 +120,7 @@ const account = () => {
           <ThemedText type='settingSubheading'>Account Details</ThemedText>
           {/* Maps over account details section [Title, Route, and pressed state] */}
           {details?.map((item:string, index) => (
-            <View key={index} className={`p-[8px]  ${index==0 ? 'mt-[12px] rounded-t-[16px]' : index+1==details.length ? 'mb-[12px] rounded-b-[16px]' : ''} flex gap-6 py-[20px] backdrop-blur-md shadow-2xl shadow-black/90  ${theme==='#ECEDEE' ? `${detailsStates[index] ? 'bg-white/20' : 'bg-white/10'}` : `${detailsStates[index] ? 'bg-black/20' : 'bg-black/10'}`} `}>
+            <View key={index} className={`p-[8px]  ${index==0 ? 'mt-[12px] rounded-t-[16px]' : index+1==details.length ? 'mb-[12px] rounded-b-[16px]' : ''} flex gap-6 py-[20px] backdrop-blur-md shadow-2xl shadow-black/90  ${theme==='dark' ? `${detailsStates[index] ? 'bg-white/20' : 'bg-white/10'}` : `${detailsStates[index] ? 'bg-black/20' : 'bg-black/10'}`} `}>
               <Pressable className='flex flex-row items-center mr-[6px]' onPressIn={() => { detailsStatesSetter[index](true)} } onPressOut={() => {detailsStatesSetter[index](false)}} onPress={() => router.push(detailsRoutes[index] as any)}><ThemedText className='ml-[16px] flex-1 ' type='settingSuboptions' >{item}</ThemedText><IconSymbol name='chevron.right' size={16} color={'gray'}/></Pressable>
             </View>
           ))}
@@ -151,7 +128,7 @@ const account = () => {
           <ThemedText type='settingSubheading'>Friends and Social</ThemedText>
           {/* Maps over friends and social section [Title, Route, and pressed state] */}
           {social?.map((item:string, index) => (
-            <View key={index} className={`p-[8px]  ${index==0 ? 'mt-[12px] rounded-t-[16px]' : index+1==social.length ? 'mb-[12px] rounded-b-[16px]' : ''} flex gap-6 py-[20px] backdrop-blur-md shadow-2xl shadow-black/40  ${theme==='#ECEDEE' ? `${socialStates[index] ? 'bg-white/20' : 'bg-white/10'}` : `${socialStates[index] ? 'bg-black/20' : 'bg-black/10'}`} `}>
+            <View key={index} className={`p-[8px]  ${index==0 ? 'mt-[12px] rounded-t-[16px]' : index+1==social.length ? 'mb-[12px] rounded-b-[16px]' : ''} flex gap-6 py-[20px] backdrop-blur-md shadow-2xl shadow-black/40  ${theme==='dark' ? `${socialStates[index] ? 'bg-white/20' : 'bg-white/10'}` : `${socialStates[index] ? 'bg-black/20' : 'bg-black/10'}`} `}>
               <Pressable className='flex flex-row items-center mr-[6px]' onPressIn={() => { socialStatesSetter[index](true)} } onPressOut={() => {socialStatesSetter[index](false)}} onPress={() => router.push(socialRoutes[index] as any)}><ThemedText className='ml-[16px] flex-1 ' type='settingSuboptions' > {item} </ThemedText>
               {index===2 && invitesCount > 0 &&
                 <View className='absolute right-[30px] align-middle bg-red-500 p-2 rounded-full' />
@@ -163,7 +140,7 @@ const account = () => {
           <ThemedText type='settingSubheading'>Contracts and Progress</ThemedText>
           {/* Maps over achievements and progress section [Title, Route, and pressed state] */}
           {progress?.map((item:string, index) => (
-            <View key={index} className={`p-[8px]  ${index==0 ? 'mt-[12px] rounded-t-[16px]' : index+1==progress.length ? 'mb-[12px] rounded-b-[16px]' : ''} flex gap-6 py-[20px] backdrop-blur-md shadow-2xl shadow-black/40  ${theme==='#ECEDEE' ? `${progressStates[index] ? 'bg-white/20' : 'bg-white/10'}` : `${progressStates[index] ? 'bg-black/20' : 'bg-black/10'}`} `}>
+            <View key={index} className={`p-[8px]  ${index==0 ? 'mt-[12px] rounded-t-[16px]' : index+1==progress.length ? 'mb-[12px] rounded-b-[16px]' : ''} flex gap-6 py-[20px] backdrop-blur-md shadow-2xl shadow-black/40  ${theme==='dark' ? `${progressStates[index] ? 'bg-white/20' : 'bg-white/10'}` : `${progressStates[index] ? 'bg-black/20' : 'bg-black/10'}`} `}>
               <Pressable className='flex flex-row items-center mr-[6px]' onPressIn={() => { progressStatesSetter[index](true)} } onPressOut={() => {progressStatesSetter[index](false)}} onPress={() => router.push(progressRoutes[index] as any)}><ThemedText className='ml-[16px] flex-1 ' type='settingSuboptions' >{item}</ThemedText><IconSymbol name='chevron.right' size={16} color={'gray'}/></Pressable>
             </View>
           ))}

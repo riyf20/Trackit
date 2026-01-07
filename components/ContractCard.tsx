@@ -2,9 +2,9 @@ import { View, Text, TouchableOpacity } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import { ThemedText } from './themed-text'
 import { BlurView } from 'expo-blur'
-import { useThemeColor } from '@/hooks/use-theme-color'
 import { Progress, ProgressFilledTrack } from '@gluestack-ui/themed'
-import Animated, { FadeInDown, FadeOutUp, Layout, runOnJS, useAnimatedStyle, useSharedValue, withDelay, withTiming } from 'react-native-reanimated'
+import Animated, { FadeInDown, FadeOutUp, Layout, runOnJS, 
+    useAnimatedStyle, useSharedValue, withDelay, withTiming } from 'react-native-reanimated'
 import { useAuthStore } from '@/utils/authStore'
 import PercentageText from './PercentageText'
 import { IconSymbol } from './ui/icon-symbol'
@@ -14,9 +14,7 @@ import { router } from 'expo-router'
 const ContractCard = ({contract}:ContractCardProps) => {
 
     // Preferance state compact/detailed view
-    const {contractCardCompact, updateContractDetails} = useAuthStore()
-
-    const theme = useThemeColor({}, 'text');
+    const {contractCardCompact, updateContractDetails, theme} = useAuthStore()
 
     // Computes percentage version of completion
     let percentage = ((contract.Streak / contract.Total_Days)*100)
@@ -98,7 +96,7 @@ const ContractCard = ({contract}:ContractCardProps) => {
 
             <Animated.View style={[{width: '88%', overflow: 'visible',}, cardSpacingStyle]} layout={Layout.springify()} entering={FadeInDown.duration(200)} exiting={FadeOutUp.duration(150)}>
 
-                <BlurView style={{width: '100%', borderRadius: 20, marginBottom: 12, zIndex: 10, overflow: 'hidden', backgroundColor: theme === "#ECEDEE" ? 'black' : 'slategray'}} tint={theme === "#ECEDEE" ? 'dark' : 'light'} intensity={theme === "#ECEDEE" ? 50 : 50}>
+                <BlurView style={{width: '100%', borderRadius: 20, marginBottom: 12, zIndex: 10, overflow: 'hidden', backgroundColor: theme === "dark" ? 'black' : 'slategray'}} tint={theme === "dark" ? 'dark' : 'light'} intensity={theme === "dark" ? 50 : 50}>
                     <View className='m-[20px] flex flex-row'>
 
                         <View
@@ -106,7 +104,7 @@ const ContractCard = ({contract}:ContractCardProps) => {
                         >
                             <BlurView
                                 intensity={20} 
-                                tint={`${theme==='#ECEDEE' ? 'light' : 'dark'}`}
+                                tint={`${theme==='dark' ? 'light' : 'dark'}`}
                                 className='w-[50px] h-[50px] justify-center items-center'
                             >
                                 <Text className='text-[28px]'>{contract.Habit_Icon}</Text>
@@ -126,7 +124,7 @@ const ContractCard = ({contract}:ContractCardProps) => {
                                     </Animated.View>
                                 :
                                     <Animated.View className='ml-[12px] mt-[6px]'>
-                                        <Progress value={percentage} style={{height: 14, backgroundColor: theme==="#ECEDEE" ? 'gray' : 'darkgray'}}>
+                                        <Progress value={percentage} style={{height: 14, backgroundColor: theme==="dark" ? 'gray' : 'darkgray'}}>
                                             <Animated.View style={progressStyle}>
                                                 <ProgressFilledTrack style={{height: 18}} />
                                             </Animated.View>
@@ -148,11 +146,11 @@ const ContractCard = ({contract}:ContractCardProps) => {
                                 <View className='absolute flex flex-row gap-[10px]'>
                                     {/* TO DO: Add connection similar to contractPill to show dynamic information [do this after logs implementation] */}
                                     <View className='flex flex-row gap-[6px] p-[6px] px-[12px] bg-green-700 opacity-85 rounded-3xl items-center'>
-                                        <IconSymbol name={'checkmark.circle'} size={22} color={theme==='#ECEDEE' ? 'white' : 'black'}/>
+                                        <IconSymbol name={'checkmark.circle'} size={22} color={theme==='dark' ? 'white' : 'black'}/>
                                         <ThemedText>Log: Sept 20</ThemedText>
                                     </View>
                                     <View className='flex flex-row gap-[6px] p-[6px] px-[12px] bg-yellow-800 opacity-85 rounded-3xl items-center'>
-                                        <IconSymbol name={'hourglass'} size={22} color={theme==='#ECEDEE' ? 'white' : 'black'}/>
+                                        <IconSymbol name={'hourglass'} size={22} color={theme==='dark' ? 'white' : 'black'}/>
                                         <ThemedText>Approval: Pending</ThemedText>
                                     </View>
                                 </View>
@@ -160,7 +158,7 @@ const ContractCard = ({contract}:ContractCardProps) => {
                             </View>
                         :
                         
-                            <Progress value={percentage} style={{width: '100%', height: 26, backgroundColor: theme==="#ECEDEE" ? 'gray' : 'darkgray'}}>
+                            <Progress value={percentage} style={{width: '100%', height: 26, backgroundColor: theme==="dark" ? 'gray' : 'darkgray'}}>
                                 <Animated.View style={progressStyle}>
                                     <ProgressFilledTrack style={{height: 30}} />
                                 </Animated.View>
@@ -177,7 +175,7 @@ const ContractCard = ({contract}:ContractCardProps) => {
                 <Animated.View style={cardStyle}>
                     {/* Underlying card details */}
 
-                    <BlurView style={{width: '100%', borderRadius: 20, position: "absolute", top: -126, overflow: 'hidden'}} tint={theme === "#ECEDEE" ? 'light' : 'dark'} intensity={30}>
+                    <BlurView style={{width: '100%', borderRadius: 20, position: "absolute", top: -126, overflow: 'hidden'}} tint={theme === "dark" ? 'light' : 'dark'} intensity={30}>
                         <View className='flex flex-row items-center justify-center pt-[50px]'>
 
                             <View className='flex flex-row pt-[20px] pb-[10px]'>

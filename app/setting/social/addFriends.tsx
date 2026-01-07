@@ -1,7 +1,6 @@
 import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
 import UserSearchCard from "@/components/UserSearchCard";
-import { useThemeColor } from "@/hooks/use-theme-color";
 import { getUserById, searchUserTable,} from "@/services/appwriteDatabase";
 import { useAuthStore } from "@/utils/authStore";
 import { Input, InputField, InputIcon, InputSlot, SearchIcon} from "@gluestack-ui/themed";
@@ -10,10 +9,9 @@ import { ScrollView, View } from "react-native";
 
 // Allows users to add friends
 const addFriends = () => {
-  const theme = useThemeColor({}, "text");
 
-  const { userId } = useAuthStore();
-
+  const { userId, username, theme } = useAuthStore();
+  
   // Hold's user's search query
   const [query, setQuery] = useState("");
   const [zeroResults, setZeroResults] = useState(false);
@@ -79,7 +77,7 @@ const addFriends = () => {
             variant="rounded"
             size="md"
             className={`mt-[8px] ${
-              theme === "#ECEDEE" ? "bg-white/90" : "bg-black/20"
+              theme === "dark" ? "bg-white/90" : "bg-black/20"
             } `}
           >
 
@@ -103,7 +101,7 @@ const addFriends = () => {
         {/* Will hold results */}
         <View
           className={` ${
-            theme === "#ECEDEE" ? "bg-white/20" : "bg-black/30"
+            theme === "dark" ? "bg-white/20" : "bg-black/30"
           } bg-gray-600 w-[90%] h-fit max-h-[86%] py-[25px] mt-[24px] rounded-3xl items-center`}
         >
           {/* Displays results */}
@@ -122,6 +120,7 @@ const addFriends = () => {
               >
               {/* Goes through the array and make component for each */}
               {list?.map((user: User, index) => (
+                (username!==user.User ?
                 <UserSearchCard
                   user={user}
                   key={index}
@@ -129,6 +128,14 @@ const addFriends = () => {
                   usersRequested={usersRequested}
                   usersInvites={usersInvites}
                 />
+                :
+                  (list.length===0 &&
+                  <ThemedText>
+                    No matching results
+                  </ThemedText>)
+
+                )
+
               ))}
             </ScrollView>
           ) 

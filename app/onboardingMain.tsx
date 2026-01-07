@@ -10,7 +10,7 @@ import FormInput from '@/components/FormInput';
 import { useWindowDimensions } from 'react-native';
 import { checkUser } from '@/services/appwriteUsers';
 import { loginUser, createUser, getUser } from '@/services/appwriteAccount';
-import { checkUserProfilePicture, getUserProfilePicture } from '@/services/appwriteStorage';
+import { checkUserProfilePicture, getUserPicture } from '@/services/appwriteStorage';
 import { useHapticFeedback as haptic} from '@/components/HapticTab';
 import ForgotPasswordModal from '@/components/ForgotPasswordModal';
 import * as Haptics from 'expo-haptics';
@@ -219,7 +219,8 @@ const onboardingMain = () => {
               sessionID: responseLogin.$id,
               defaultPicture: true,
               profilePictureFileId: '',
-              profilePictureFileUrl: ''
+              profilePictureFileUrl: '',
+              theme: 'dark'
             });
             
           } catch (error:any) {
@@ -292,7 +293,7 @@ const onboardingMain = () => {
   // Grabs the url of profile picture based on id
   const getUserProfilePic = async (fileId:string) => {
     try {
-      const profilePictureUrl = getUserProfilePicture(fileId);
+      const profilePictureUrl = getUserPicture(fileId);
 
       return profilePictureUrl;
     } catch (error:any) {
@@ -354,6 +355,7 @@ const onboardingMain = () => {
         defaultPicture: (!userProfilePic),
         profilePictureFileId:  `${userProfilePic ? userLoginResponse.userId : ''}`,
         profilePictureFileUrl:userProfilePicUrl,
+        theme: userResponse.prefs.theme,
       })
   
     } catch (errorUserLogin:any) {

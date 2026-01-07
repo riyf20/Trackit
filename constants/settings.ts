@@ -45,5 +45,6 @@ export const systemSettingInformation = [
   'Pinning cards allows you to place your desired contract card at the top. This is ideal when you have multiple contracts but want to access a certain one first.',
   'Choose a view for the cards on the contracts page. Detailed expands to show logs and submissions. Compact simplifies and reduces to show only the essential information.',
   'Choose a view for the cards on the logs page. Selected option will apply to both `My Logs` and `To Verify`. Detailed expands to show preview of notes and media. Compact simplifies to show only the essential information.',
+  'Hides Notes and Media input fields if they are optional for your selected contract.',
   'Toggles between native dark mode and light mode.'
 ]

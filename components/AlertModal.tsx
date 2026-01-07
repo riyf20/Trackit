@@ -4,8 +4,8 @@ import {
   ModalBody, ModalFooter,  Button, ButtonText,
   Heading, Text,
   Spinner} from '@gluestack-ui/themed';
-import { useThemeColor } from '@/hooks/use-theme-color';
 import { useHapticFeedback as haptic} from '@/components/HapticTab';
+import { useAuthStore } from '@/utils/authStore';
 
 // Confirmation modal component | Will show loader 
 const AlertModal = ({modalOpened, confirmFunction, setModalOpened, isLoading}:alertModalProps) => {
@@ -22,8 +22,8 @@ const AlertModal = ({modalOpened, confirmFunction, setModalOpened, isLoading}:al
     }
   }, [showModal])
 
-  const theme = useThemeColor({}, 'text');
-
+  const {theme} = useAuthStore()
+  
   return (
     <>
       <Modal
@@ -33,17 +33,17 @@ const AlertModal = ({modalOpened, confirmFunction, setModalOpened, isLoading}:al
         }}
       >
         <ModalBackdrop  />
-        <ModalContent style={{ backgroundColor: `${theme==='#ECEDEE' ? 'rgba(60, 60, 60)' : 'rgba(235, 235, 235)'}`}}>
+        <ModalContent style={{ backgroundColor: `${theme==='dark' ? 'rgba(60, 60, 60)' : 'rgba(235, 235, 235)'}`}}>
 
           <ModalHeader style={{display: 'flex', flexDirection: 'row', gap: '8', justifyContent: 'center'}}>
-            <Heading color={`${theme==='#ECEDEE' ? 'white' : 'black'}`} >{isLoading ? 'Uploading Changes' : 'Changes Saved'}</Heading>
+            <Heading color={`${theme==='dark' ? 'white' : 'black'}`} >{isLoading ? 'Uploading Changes' : 'Changes Saved'}</Heading>
           </ModalHeader>
 
           <ModalBody >
             {isLoading && 
               <Spinner size="large" color="gray" className='my-[12px]'/>
             }
-            <Text color={`${theme==='#ECEDEE' ? 'white' : 'black'}`} style={{textAlign: 'center'}}>{isLoading ? 'Please wait while we update your changes' : 'Your changes have been saved.'}</Text> 
+            <Text color={`${theme==='dark' ? 'white' : 'black'}`} style={{textAlign: 'center'}}>{isLoading ? 'Please wait while we update your changes' : 'Your changes have been saved.'}</Text> 
           </ModalBody>
 
           <ModalFooter>

@@ -1,7 +1,6 @@
 import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
 import UserCard from "@/components/UserCard";
-import { useThemeColor } from "@/hooks/use-theme-color";
 import { getUserById } from "@/services/appwriteDatabase";
 import { useAuthStore } from "@/utils/authStore";
 import React, { useEffect, useState } from "react";
@@ -9,9 +8,8 @@ import { ScrollView, View } from "react-native";
 
 // Allows users to view their current friends
 const friendsList = () => {
-  const theme = useThemeColor({}, "text");
 
-  const { userId } = useAuthStore();
+  const { userId, theme } = useAuthStore();
 
   // Hold's list of users's friends and requests
   const [usersFriends, setUsersFriends] = useState([]);
@@ -73,7 +71,7 @@ const friendsList = () => {
 
         <View
           className={` ${
-            theme === "#ECEDEE" ? "bg-white/20" : "bg-black/30"
+            theme === "dark" ? "bg-white/20" : "bg-black/30"
           } bg-gray-600 w-[90%] h-fit py-[25px] mt-[12px] rounded-3xl items-center`}
         >
           {/* Shows loading text */}
@@ -105,7 +103,7 @@ const friendsList = () => {
 
         <View
           className={` ${
-            theme === "#ECEDEE" ? "bg-white/20" : "bg-black/30"
+            theme === "dark" ? "bg-white/20" : "bg-black/30"
           } bg-gray-600 w-[90%] h-fit py-[25px] mt-[12px] rounded-3xl items-center`}
         >
           {/* Shows list of requests */}

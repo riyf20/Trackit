@@ -278,3 +278,74 @@ export const searchUserContract = async (username:string, userID:string) => {
         return(result);
     }
 }
+
+// Endpoint: Adds users new log 
+export const addUsersLogTable = async (userId:string, contractId: string, loggedDate: string, 
+    loggedStreak: number, notes: string, mediaCount: number, difficulty:string) => {
+
+    let verification = difficulty === 'Beginner' ? 'Approved' : 'Pending'
+
+    const result = await databases.createDocument({
+        databaseId: process.env.EXPO_PUBLIC_APPWRITE_DATABASE_ID,
+        collectionId: process.env.EXPO_PUBLIC_APPWRITE_LOGS_COLLECTION_ID,
+        documentId: ID.unique(),
+        data: {
+            "User_ID": userId,
+            "Contract_ID": contractId,
+            "Logged_Date": loggedDate,
+            "Logged_Streak": loggedStreak,
+            "Notes": notes,
+            "Media_Count": mediaCount,
+            "Media_Ids": [],
+            "Status": verification,
+        },
+    })
+    return(result)
+}
+
+// Endpoint: Updates user's log count in contracts table
+export const updateUserLogCount = async (contractId: string, count:number) => {
+
+    const result = await databases.updateDocument({
+        databaseId: process.env.EXPO_PUBLIC_APPWRITE_DATABASE_ID,
+        collectionId: process.env.EXPO_PUBLIC_APPWRITE_CONTRACTS_COLLECTION_ID,
+        documentId: contractId,
+        data: {
+            "Streak": count,
+        },
+    })
+}
+
+// Endpoint: Updates media[] in logs after media has been uploaded | links to associated media
+export const updateUserLogMediaArray = async (logId:string, mediaIds: string[]) => {
+
+    const result = await databases.updateDocument({
+        databaseId: process.env.EXPO_PUBLIC_APPWRITE_DATABASE_ID,
+        collectionId: process.env.EXPO_PUBLIC_APPWRITE_LOGS_COLLECTION_ID,
+        documentId: logId,
+        data: {
+            "Media_Ids": mediaIds,
+        },
+    })
+}
+
+// Endpoint: Queries' all logs based on given username 
+export const searchUserLogs = async (userID:string) => {
+
+    // Gets results of queried search
+    const result = await databases.listDocuments({
+        databaseId: process.env.EXPO_PUBLIC_APPWRITE_DATABASE_ID,
+        collectionId: process.env.EXPO_PUBLIC_APPWRITE_LOGS_COLLECTION_ID,
+        queries: [
+            Query.search('User_ID', userID),
+            Query.orderDesc('$createdAt')
+        ]
+    })
+
+    // If no result was found just returns false
+    if(result.total === 0) {
+        return false
+    } else {
+        return(result);
+    }
+}

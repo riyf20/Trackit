@@ -3,7 +3,6 @@ import React, { useEffect, useRef, useState } from 'react'
 import { ThemedView } from '@/components/themed-view'
 import { ThemedText } from '@/components/themed-text'
 import { IconSymbol } from '@/components/ui/icon-symbol'
-import { useThemeColor } from '@/hooks/use-theme-color';
 import { router } from 'expo-router'
 import { AlertCircleIcon, Button, ButtonText, FormControl, 
     FormControlError, FormControlErrorIcon, FormControlErrorText, 
@@ -21,7 +20,7 @@ import { updateUsernameTable } from '@/services/appwriteDatabase'
 // Allows users to change profile picture, username, and email
 const accountInformation = () => {
 
-    const theme = useThemeColor({}, 'text');
+    const {theme} = useAuthStore()
 
     const {userId, username, email, password, updateEmail, updateUsername, 
         profilePictureFileId, profilePictureFileUrl, defaultPicture,
@@ -196,7 +195,7 @@ const accountInformation = () => {
             
             <View className='h-full flex items-center'>
 
-                <View className={` ${theme==='#ECEDEE' ? 'bg-white/20' : 'bg-black/30'} bg-gray-600 w-[90%] h-fit pb-[50px] mt-[12px] rounded-3xl items-center`} >
+                <View className={` ${theme==='dark' ? 'bg-white/20' : 'bg-black/30'} bg-gray-600 w-[90%] h-fit pb-[50px] mt-[12px] rounded-3xl items-center`} >
                     
                     <Image
                         source={basePicture ? images.profile : {uri: url}}
@@ -214,7 +213,7 @@ const accountInformation = () => {
                                     onPressIn={() => {handlePressed()}} onPressOut={() => setPressed(false)} onPress={() => {bottomRef.current?.open()}}
                                 >
                                     <ThemedText className='w-[88%] ml-[12px]' darkColor='black' lightColor='white'>Change Profile Picture</ThemedText>
-                                    <IconSymbol name='chevron.up' size={16} color={theme==='#ECEDEE' ? 'black' : 'white'}/>
+                                    <IconSymbol name='chevron.up' size={16} color={theme==='dark' ? 'black' : 'white'}/>
                                 </Pressable>
                             </View>
 

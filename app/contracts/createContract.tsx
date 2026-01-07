@@ -15,6 +15,7 @@ import { BlurView } from 'expo-blur'
 import { useAuthStore } from '@/utils/authStore'
 import { addUserContract } from '@/services/appwriteDatabase'
 import * as Haptics from 'expo-haptics';
+import CreateConfirmationPage from '@/components/CreateConfirmationPage'
 
 
 {/* TO DO: Add modal confirming if users hit back button (at top) or cancel if they want to lose changes */}
@@ -22,9 +23,7 @@ import * as Haptics from 'expo-haptics';
 const createContract = () => {
 
     // On device variables
-    const {username, userId} = useAuthStore()
-
-    const theme = useThemeColor({}, 'text');
+    const {username, userId, theme} = useAuthStore()
     
     // Page/step of the form
     const [page, setPage] = useState(1);
@@ -119,54 +118,18 @@ const createContract = () => {
       className='h-full flex flex-1 items-center'
     >
         {/* All pages and their variables linked as props */}
-        {page===1 ? 
-            <Page1 page={page} shown={page1Shown} habitName={habitName} setHabitName={setHabitName} selectedEmoji={selectedEmoji} setSelectedEmoji={setSelectedEmoji}/>
-        : page===2 ? 
-            <Page2 page={page} shown={page2Shown} frequency={frequency} setFrequency={setFrequency} count={count} setCount={setCount} duration={duration} setDuration={setDuration} endDate={endDate} setEndDate={setEndDate} />
-        : page===3 ?
-            <Page3 />
-        : page===4 ?
-            <Page4 selectedEmoji={selectedEmoji} habitName={habitName} frequency={frequency} count={count} duration={duration} endDate={endDate} />
-        : page===5 ?
         
-            <View className='flex h-[70%] justify-center items-center'>
-                <Animated.View entering={FadeIn.springify().duration(1200)}>
-                    {/* Confirmation modal | Renders Liquid Glass is compatible otherwise Blurview */}
-                        <View className='overflow-hidden rounded-2xl'>
-                            <BlurView
-                                className='flex p-[28px]'
-                                intensity={20} 
-                                tint={`${theme==='#ECEDEE' ? 'light' : 'dark'}`}
-                            >
-                                <Animated.View entering={FadeInUp.springify().duration(1400)}>
-                                    <ThemedText type="title" className="mb-[12px]">Congratulations!</ThemedText>
-                                </Animated.View>
-
-                                <Animated.View entering={FadeIn.springify().delay(150).duration(1600)}>
-                                    <ThemedText type="defaultSemiBold" darkColor="gray">
-                                        The new you is one step closer.
-                                    </ThemedText>
-                                </Animated.View>
-
-                                <Animated.View entering={FadeIn.springify().delay(300).duration(1800)}>
-                                    <ThemedText type="defaultSemiBold" darkColor="gray">
-                                        Let's get started!
-                                    </ThemedText>
-                                </Animated.View>
-                            </BlurView>
-                        </View>
-                </Animated.View>
-                {/* Button redirecting to contracts page */}
-                <Animated.View entering={FadeInDown.springify().delay(1600).duration(800)}>
-                    <Button className='mt-[24px] flex gap-[10px]' onPress={() => {router.back()}}>
-                        <IconSymbol name='chevron.left' size={16} color={'white'}/>
-                        <ButtonText>Contracts</ButtonText>
-                    </Button>
-                </Animated.View>
-            </View>
-        : 
-        <></>
-        
+            {page===1 ? 
+                (<Page1 page={page} shown={page1Shown} habitName={habitName} setHabitName={setHabitName} selectedEmoji={selectedEmoji} setSelectedEmoji={setSelectedEmoji}/>)
+            : page===2 ? 
+                (<Page2 page={page} shown={page2Shown} frequency={frequency} setFrequency={setFrequency} count={count} setCount={setCount} duration={duration} setDuration={setDuration} endDate={endDate} setEndDate={setEndDate} />)
+            : page===3 ?
+                (<Page3 />)
+            : page===4 ?
+                (<Page4 selectedEmoji={selectedEmoji} habitName={habitName} frequency={frequency} count={count} duration={duration} endDate={endDate} />)
+            : page===5 ?
+                (<CreateConfirmationPage parent={'Contracts'} />)
+            : null
         }
          
         {page!==5 &&
@@ -185,14 +148,14 @@ const createContract = () => {
                 {page===1 ? 
                     // Page 1 renders 'Cancel' | Goes back to contracts page
                     <Button action='secondary' variant='outline' onPress={() => {router.back()}} onPressIn={() => {Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium)}}>
-                        <IconSymbol name='chevron.left' size={14} color={theme==='#ECEDEE' ? 'white' : 'black'} />
-                        <ButtonText color={theme==='#ECEDEE' ? 'white' : 'black'} className='ml-[6px]'>Cancel</ButtonText>
+                        <IconSymbol name='chevron.left' size={14} color={theme==='dark' ? 'white' : 'black'} />
+                        <ButtonText color={theme==='dark' ? 'white' : 'black'} className='ml-[6px]'>Cancel</ButtonText>
                     </Button>
                     :
                     // Page 2-4 renders 'Back' | Goes back a page
                     <Button action='secondary' variant='outline' onPress={() => {setPage(page-1)}} onPressIn={() => {Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium)}}>
-                        <IconSymbol name='chevron.left' size={14} color={theme==='#ECEDEE' ? 'white' : 'black'} />
-                        <ButtonText color={theme==='#ECEDEE' ? 'white' : 'black'} className='ml-[6px]'>Back</ButtonText>
+                        <IconSymbol name='chevron.left' size={14} color={theme==='dark' ? 'white' : 'black'} />
+                        <ButtonText color={theme==='dark' ? 'white' : 'black'} className='ml-[6px]'>Back</ButtonText>
                     </Button>
                 }
                 {page===4 ? 

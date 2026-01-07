@@ -1,6 +1,5 @@
 import { View, Text } from 'react-native'
 import React, { useEffect, useState } from 'react'
-import { useThemeColor } from '@/hooks/use-theme-color';
 import Animated, { FadeIn, useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated'
 import { ThemedText } from '../themed-text';
 import { Input, InputField, Button, ButtonText } from '@gluestack-ui/themed';
@@ -8,13 +7,14 @@ import { IconSymbol } from '../ui/icon-symbol';
 import EmojiPicker, { emojiData } from '@hiraku-ai/react-native-emoji-picker';
 import { BlurView } from 'expo-blur';
 import * as Haptics from 'expo-haptics';
+import { useAuthStore } from '@/utils/authStore';
 
 
 // [Create Contract | Page 1] - Allows users to customize Habit name and icon
 const Page1 = ({page, shown, habitName, setHabitName, selectedEmoji, setSelectedEmoji}:Page1Props) => {
 
     {/* TO DO: Message alerting users to make informative habit names */}
-    const theme = useThemeColor({}, 'text');
+    const {theme} = useAuthStore()
 
     // Imported emoji picker component 
     const [isEmojiPickerVisible, setEmojiPickerVisible] = useState(false);
@@ -68,12 +68,12 @@ const Page1 = ({page, shown, habitName, setHabitName, selectedEmoji, setSelected
         {/* Page 1  */}
         <View className='w-[80%] items-center mt-[6%]'>
             {/* First block | Habit name and input field */}
-            <View className={`w-full py-[14px] px-[8px] items-start rounded-2xl ${theme==='#ECEDEE' ? 'bg-black' : 'bg-gray-600'} z-10`}>
+            <View className={`w-full py-[14px] px-[8px] items-start rounded-2xl ${theme==='dark' ? 'bg-black' : 'bg-gray-600'} z-10`}>
                 <Animated.View entering={FadeIn.duration(1000)} >
                     <ThemedText type='onboarding' lightColor='white' className='ml-[4px]'>Your Habit</ThemedText>
                 </Animated.View>
             </View>
-            <Animated.View style={block1Style} className={`w-full flex items-center rounded-xl top-[-22px] ${theme==='#ECEDEE' ? 'bg-white/20' : 'bg-gray-400'} `}>
+            <Animated.View style={block1Style} className={`w-full flex items-center rounded-xl top-[-22px] ${theme==='dark' ? 'bg-white/20' : 'bg-gray-400'} `}>
                 <Animated.View style={block1InputStyle} className='w-[90%] mt-[30px]'>
                     <Input
                         variant='rounded' size='md' className='mt-[8px] bg-white/30 border-transparent'
@@ -90,19 +90,19 @@ const Page1 = ({page, shown, habitName, setHabitName, selectedEmoji, setSelected
         
         <View className='w-[80%] items-center mt-[6%]'>
             {/* Second block | Habit icon and edit button */}
-            <View className={`w-full py-[14px] px-[8px] items-start rounded-2xl ${theme==='#ECEDEE' ? 'bg-black' : 'bg-gray-600'} z-10`}>
+            <View className={`w-full py-[14px] px-[8px] items-start rounded-2xl ${theme==='dark' ? 'bg-black' : 'bg-gray-600'} z-10`}>
                 <Animated.View entering={FadeIn.duration(1200)} >
                     <ThemedText type='onboarding' lightColor='white' className='ml-[4px]'>Your Habit Icon</ThemedText>
                 </Animated.View>
             </View>
-            <Animated.View style={block2Style} className={`w-full flex items-center rounded-xl top-[-22px] ${theme==='#ECEDEE' ? 'bg-white/20' : 'bg-gray-400'} `}>
+            <Animated.View style={block2Style} className={`w-full flex items-center rounded-xl top-[-22px] ${theme==='dark' ? 'bg-white/20' : 'bg-gray-400'} `}>
                 <View className='w-[90%] mt-[40px] flex items-center justify-center'>
                     <Animated.View style={block2IconStyle}>
 
                         <View className='w-[75px] h-[75px] rounded-2xl justify-center items-center overflow-hidden'>
                             <BlurView
                                 intensity={100} 
-                                tint={`${theme==='#ECEDEE' ? 'dark' : 'light'}`}
+                                tint={`${theme==='dark' ? 'dark' : 'light'}`}
                                 className='flex flex-1 h-full w-full items-center justify-center'
                             >
                                 <Text className='text-[48px]'>{selectedEmoji}</Text>
@@ -129,7 +129,7 @@ const Page1 = ({page, shown, habitName, setHabitName, selectedEmoji, setSelected
                         showHistoryTab={false}
                         showSearchBar={true}
                         showTabs={false}
-                        darkMode={theme==='#ECEDEE' ? true : false}
+                        darkMode={theme==='dark' ? true : false}
                     />
                 </View>
             </Animated.View>

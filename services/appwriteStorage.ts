@@ -19,11 +19,8 @@ export const checkUserProfilePicture = async (fileId:string) => {
 }
 
 // Endpoint: Appends and returns the live link for picture
-export const getUserProfilePicture = (fileId: string) => {
+export const getUserPicture = (fileId: string) => {
   return `${process.env.EXPO_PUBLIC_APPWRITE_ENDPOINT}/storage/buckets/${process.env.EXPO_PUBLIC_APPWRITE_BUCKET_ID}/files/${fileId}/view?project=${process.env.EXPO_PUBLIC_APPWRITE_PROJECT_ID}`;
-  
-  // {TO DO: Try optimizing image fetch }
-  // return storage.getFileView(process.env.EXPO_PUBLIC_APPWRITE_BUCKET_ID!, fileId);
 };
 
 // Endpoint: Deletes current profile picture

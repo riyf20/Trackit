@@ -1,8 +1,7 @@
-import { View, Text } from 'react-native'
+import { View } from 'react-native'
 import React, { useState } from 'react'
 import { ThemedText } from '@/components/themed-text'
 import { ThemedView } from '@/components/themed-view'
-import { useThemeColor } from '@/hooks/use-theme-color';
 import { FormControl, Input, InputField, FormControlError, 
   FormControlErrorIcon, AlertCircleIcon, FormControlErrorText, 
   Button, ButtonText } from '@gluestack-ui/themed';
@@ -15,7 +14,7 @@ import AlertModal from '@/components/AlertModal';
 // Allows users to change password
 const accountPassword = () => {
 
-  const theme = useThemeColor({}, 'text');
+  const {theme} = useAuthStore()
 
   const {password, updatePassword} = useAuthStore();
   
@@ -120,7 +119,7 @@ const accountPassword = () => {
             
       <View className=' h-full flex items-center'>
 
-        <View className={` ${theme==='#ECEDEE' ? 'bg-white/20' : 'bg-black/30'} bg-gray-600 w-[90%] h-fit pb-[50px] mt-[12px] rounded-3xl items-center`} >
+        <View className={` ${theme==='dark' ? 'bg-white/20' : 'bg-black/30'} bg-gray-600 w-[90%] h-fit pb-[50px] mt-[12px] rounded-3xl items-center`} >
 
           <View className='mt-[24px] w-[86%]'>
           

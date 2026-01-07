@@ -1,15 +1,17 @@
 import { View, Text, Pressable } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import { ThemedText } from '../themed-text'
-import { useThemeColor } from '@/hooks/use-theme-color';
-import { Select, SelectTrigger, SelectInput, SelectIcon, ChevronDownIcon, SelectPortal, SelectBackdrop, SelectContent, SelectDragIndicatorWrapper, SelectDragIndicator, SelectItem } from '@gluestack-ui/themed';
+import { Select, SelectTrigger, SelectInput, SelectIcon, 
+    ChevronDownIcon, SelectPortal, SelectBackdrop, SelectContent, 
+    SelectDragIndicatorWrapper, SelectDragIndicator, SelectItem } from '@gluestack-ui/themed';
 import Animated, { useSharedValue, useAnimatedStyle, withTiming, FadeIn } from 'react-native-reanimated';
 import { addWeeks, addMonths, format } from 'date-fns';
+import { useAuthStore } from '@/utils/authStore';
 
 // [Create Contract | Page 2] - Allows users to set frequency, count, and duration
 const Page2 = ({page, shown, frequency, setFrequency, count, setCount, duration, setDuration, endDate, setEndDate }:Page2Props) => {
 
-    const theme = useThemeColor({}, 'text');
+    const {theme} = useAuthStore()
 
     // Min and Max limits for the counter
     const [minLimit, setMinLimit] = useState(true)
@@ -122,12 +124,12 @@ const Page2 = ({page, shown, frequency, setFrequency, count, setCount, duration,
         {/* Page 2 */}
         <View className='w-[80%] items-center mt-[6%]'>
             {/* First block | Habit frequency and counter */}
-            <View className={`w-full py-[14px] px-[8px] items-start rounded-2xl ${theme==='#ECEDEE' ? 'bg-black' : 'bg-gray-600'} z-10`}>
+            <View className={`w-full py-[14px] px-[8px] items-start rounded-2xl ${theme==='dark' ? 'bg-black' : 'bg-gray-600'} z-10`}>
                 <Animated.View entering={FadeIn.duration(1000)} >
                     <ThemedText type='onboarding' lightColor='white' className='ml-[4px]'>Frequency</ThemedText>
                 </Animated.View>
             </View>
-            <Animated.View style={block1Style} className={`w-full flex items-center rounded-xl top-[-22px] ${theme==='#ECEDEE' ? 'bg-white/20' : 'bg-gray-400'} `}>
+            <Animated.View style={block1Style} className={`w-full flex items-center rounded-xl top-[-22px] ${theme==='dark' ? 'bg-white/20' : 'bg-gray-400'} `}>
                 <View className='w-[90%] mt-[40px]'>
                     
                     <Animated.View style={block1InputStyle}>
@@ -177,12 +179,12 @@ const Page2 = ({page, shown, frequency, setFrequency, count, setCount, duration,
         
         <View className='w-[80%] items-center mt-[6%]'>
             {/* Second block | Habit Duration and selector */}
-            <View className={`w-full py-[14px] px-[8px] items-start rounded-2xl ${theme==='#ECEDEE' ? 'bg-black' : 'bg-gray-600'} z-10`}>
+            <View className={`w-full py-[14px] px-[8px] items-start rounded-2xl ${theme==='dark' ? 'bg-black' : 'bg-gray-600'} z-10`}>
                 <Animated.View entering={FadeIn.duration(1000)}>
                     <ThemedText type='onboarding' lightColor='white' className='ml-[4px]'>Contract Duration</ThemedText>
                 </Animated.View>
             </View>
-            <Animated.View style={block2Style} className={`w-full flex items-center rounded-xl top-[-22px] ${theme==='#ECEDEE' ? 'bg-white/20' : 'bg-gray-400'} `}>
+            <Animated.View style={block2Style} className={`w-full flex items-center rounded-xl top-[-22px] ${theme==='dark' ? 'bg-white/20' : 'bg-gray-400'} `}>
                 <Animated.View style={block2InputStyle} className='w-[90%] mt-[40px]'>
                     <Select 
                         className='bg-gray-100 rounded-full'

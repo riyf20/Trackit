@@ -46,6 +46,7 @@ export function ThemedText({
 
 
 // Expanding off the Expo template | implemented custom version
+// TO DO: Change the styles to be better 
 const styles = StyleSheet.create({
   default: {
     fontSize: 16,

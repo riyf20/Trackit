@@ -21,9 +21,9 @@ import { useAuthStore } from '@/utils/authStore';
 {/* TO DO: finish implementation | need to link email provider */}
 const ForgotPasswordModal = ({forgotPasswordShowModal, setForgotPasswordShowModal}:ForgotPasswordModalProps) => {
 
-  const theme = useThemeColor({}, 'text');
+  // const theme = useThemeColor({}, 'text');
 
-  const { email} = useAuthStore()
+  const { email, theme} = useAuthStore()
     
   const keyboardshift = useSharedValue(0);
   
@@ -168,12 +168,12 @@ const ForgotPasswordModal = ({forgotPasswordShowModal, setForgotPasswordShowModa
         <ModalBackdrop />
         <Animated.View style={keyboardShiftStyle}>
         {/*  ${theme==='#ECEDEE' ? `${detailsStates[index] ? 'bg-white/20' : 'bg-white/10'}` : `${detailsStates[index] ? 'bg-black/20' : 'bg-black/10'}`} */}
-          <ModalContent  style={{ backgroundColor: `${theme==='#ECEDEE' ? 'rgba(60, 60, 60)' : 'rgba(235, 235, 235)'}`}}>
+          <ModalContent  style={{ backgroundColor: `${theme==='dark' ? 'rgba(60, 60, 60)' : 'rgba(235, 235, 235)'}`}}>
             
 
             <ModalHeader style={{display: 'flex', flexDirection: 'column', gap: '8'}}>
-              <Heading color={`${theme==='#ECEDEE' ? 'white' : 'black'}`} >Forgot password?</Heading>
-              <Text style={{textAlign: 'center', marginBottom: 12}} size="sm" color={`${theme==='#ECEDEE' ? 'white' : 'black'}`}>Enter your username and email to reset password.</Text>
+              <Heading color={`${theme==='dark' ? 'white' : 'black'}`} >Forgot password?</Heading>
+              <Text style={{textAlign: 'center', marginBottom: 12}} size="sm" color={`${theme==='dark' ? 'white' : 'black'}`}>Enter your username and email to reset password.</Text>
             </ModalHeader>
 
             <ModalBody  >
@@ -185,7 +185,7 @@ const ForgotPasswordModal = ({forgotPasswordShowModal, setForgotPasswordShowModa
                     setUsernameInvalid(false)
                     setFormInvalid(false)
                   }} 
-                  color={`${theme==='#ECEDEE' ? 'white' : 'black'}`} />
+                  color={`${theme==='dark' ? 'white' : 'black'}`} />
                 </Input>
 
                 <Input>
@@ -195,7 +195,7 @@ const ForgotPasswordModal = ({forgotPasswordShowModal, setForgotPasswordShowModa
                     setEmailInvalid(false)
                     setFormInvalid(false)
                   }} 
-                  color={`${theme==='#ECEDEE' ? 'white' : 'black'}`} />
+                  color={`${theme==='dark' ? 'white' : 'black'}`} />
                 </Input>
 
                 <FormControlError className='bg-red-300 rounded-3xl p-[2px] w-[100%] flex justify-center items-center'>
@@ -326,12 +326,12 @@ const ForgotPasswordModal = ({forgotPasswordShowModal, setForgotPasswordShowModa
         <ModalBackdrop />
         <Animated.View style={keyboardShiftStyle}>
         {/*  ${theme==='#ECEDEE' ? `${detailsStates[index] ? 'bg-white/20' : 'bg-white/10'}` : `${detailsStates[index] ? 'bg-black/20' : 'bg-black/10'}`} */}
-          <ModalContent  style={{width: 355,backgroundColor: `${theme==='#ECEDEE' ? 'rgba(60, 60, 60)' : 'rgba(235, 235, 235)'}`}}>
+          <ModalContent  style={{width: 355,backgroundColor: `${theme==='dark' ? 'rgba(60, 60, 60)' : 'rgba(235, 235, 235)'}`}}>
             
 
             <ModalHeader style={{display: 'flex', flexDirection: 'column', gap: '8'}}>
-              <Heading color={`${theme==='#ECEDEE' ? 'white' : 'black'}`} >Reset password</Heading>
-              <Text style={{textAlign: 'center', marginBottom: 12}} size="sm" color={`${theme==='#ECEDEE' ? 'white' : 'black'}`}>A verification code has been sent to you. Enter the code below..</Text>
+              <Heading color={`${theme==='dark' ? 'white' : 'black'}`} >Reset password</Heading>
+              <Text style={{textAlign: 'center', marginBottom: 12}} size="sm" color={`${theme==='dark' ? 'white' : 'black'}`}>A verification code has been sent to you. Enter the code below..</Text>
             </ModalHeader>
 
             <ModalBody>
@@ -342,7 +342,7 @@ const ForgotPasswordModal = ({forgotPasswordShowModal, setForgotPasswordShowModa
                     setCodeValue(text)
                     setVerificationFormInvalid(false)
                   }} 
-                  color={`${theme==='#ECEDEE' ? 'white' : 'black'}`} />
+                  color={`${theme==='dark' ? 'white' : 'black'}`} />
                 </Input>
 
                 <FormControlError className='bg-red-300 rounded-3xl p-[2px] w-[100%] flex justify-center items-center'>

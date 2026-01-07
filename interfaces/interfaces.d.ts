@@ -35,8 +35,13 @@ interface alertModalProps {
 interface BottomProps {
     parent:string,
     keyboard?: Boolean,
-    altered: boolean,
-    setAltered: (args0:boolean) => void,
+    altered?: boolean,
+    setAltered?: (args0:boolean) => void,
+    backdrop?: (args0:boolean) => void; 
+    selectedItems?: ImagePicker.ImagePickerAsset[]
+    setSelectedItems?: (args0:ImagePicker.ImagePickerAsset[]) => void;
+    videoThumbnails?: Record<string, string>
+    setVideoThumbnails?: (args0:Record<string, string>) => void;
 }
 
 interface BottomSheetHandle {
@@ -46,10 +51,17 @@ interface BottomSheetHandle {
     close: () => void;
 }
 
-
 interface ImageUploaderProps {
     setClose: () => void;
     setAltered: (args0:boolean) => void,
+}
+
+interface ImageUploaderLogsProps {
+    setClose: () => void;
+    selectedPictures: ImagePicker.ImagePickerAsset[]
+    setSelectedPictures: (args0:ImagePicker.ImagePickerAsset[]) => void;
+    thumbnails: Record<string, string>
+    setThumbnails: (args0:Record<string, string>) => void;
 }
 
 interface ImageCardProps {
@@ -138,15 +150,41 @@ interface Contract {
     Active: boolean,
 }
 
+interface Log {
+    $id: string,
+    User_ID: string,
+    Contract_ID: string,
+    Logged_Streak: number,
+    Logged_Date: string,
+    Notes: string,
+    Media_Count: number,
+    Media_Ids: string[],
+    Status: string,
+    $createdAt: string,
+}
+
+interface ContractOption {
+    Name: string,
+    Icon: string,
+    Count: number,
+    Difficulty: string,
+    Streak: number,
+    Id: string,
+    Total: number
+}
+
 interface ContractCardProps {
     contract: Contract,
 }
 
 interface FilterMenuProps {
     parent: string,
-    changeFilter: (args0:string) => void
+    changeFilter: (args0:string) => void,
     menuOpen: boolean,
-    setMenuOpen: (args0:boolean) => void
+    setMenuOpen: (args0:boolean) => void,
+    contractNames?: ContractOption[]
+    dateText? : DateType,
+    clearDate? : (args0: boolean) => void,
 }
 
 interface PercentageTextProps {
@@ -157,7 +195,8 @@ interface PercentageTextProps {
 
 interface ToastAlertProps {
     parent: string,
-    card: string,
+    card?: string,
+    show?: boolean
 }
 
 interface ContractPillProps {
@@ -171,4 +210,26 @@ interface FilterMenuOptionProps {
     onPress: () => void;
     active: boolean;
     setMenuOpen: (args0:boolean) => void;
+    logs?: boolean,
+    count?:number,
+}
+
+interface ContractSelectorProps {
+    selectorOpen: boolean,
+    setSelectorOpen: (args0: boolean) => void
+    setSelectedContract: (args0: ContractOption) => void;
+} 
+
+interface CreateConfirmationPageProps {
+    parent: string,
+}
+
+interface LogCardProps {
+    log: Log,
+    contract: ContractOption,
+}
+
+interface FilterMenuDatePickerProps {
+    selectedDate: DateType | null,
+    changeFilter: (date: DateType | null) => void,
 }

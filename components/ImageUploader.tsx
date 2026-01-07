@@ -8,7 +8,7 @@ import { IconSymbol } from "./ui/icon-symbol";
 import { useThemeColor } from "@/hooks/use-theme-color";
 import { useAuthStore } from "@/utils/authStore";
 import { images } from "@/constants/images";
-import { deleteUserProfilePicture, getUserProfilePicture } from "@/services/appwriteStorage";
+import { deleteUserProfilePicture, getUserPicture } from "@/services/appwriteStorage";
 import {updateUserProfilePicture} from '@/services/appwriteStorageWeb'
 import AlertModal from "./AlertModal";
 import { router } from "expo-router";
@@ -68,7 +68,6 @@ const ImageUploader = ({setClose, setAltered}:ImageUploaderProps) => {
     };
 
     const haptic = useHapticFeedback();
-    const theme = useThemeColor({}, 'text');
 
     const handleRevert = () => {
         setChanges(true);
@@ -131,7 +130,7 @@ const ImageUploader = ({setClose, setAltered}:ImageUploaderProps) => {
                                 const add = await updateUserProfilePicture(userId, newImage.uri, newImage.fileName!, newImage.mimeType!, newImage.fileSize!)
 
                                 // Grabs url of the new picture
-                                const newUrl = getUserProfilePicture(userId);
+                                const newUrl = getUserPicture(userId);
 
                                 // Send the url to table
                                 try {
@@ -166,7 +165,7 @@ const ImageUploader = ({setClose, setAltered}:ImageUploaderProps) => {
                             const add = await updateUserProfilePicture(userId, newImage.uri, newImage.fileName!, newImage.mimeType!, newImage.fileSize!)
                             
                             // Grabs url of the new picture
-                            const newUrl = getUserProfilePicture(userId);
+                            const newUrl = getUserPicture(userId);
 
                             // Send the url to table
                             try {

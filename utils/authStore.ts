@@ -45,6 +45,18 @@ type UserState = {
 
     contractDetails: Contract | null;
     updateContractDetails: (newContract:Contract) => void;
+
+    logsCardCompact: boolean;
+    updateLogsCard: (logsCardCompact:boolean) => void;
+
+    contractNames: ContractOption[] | null;
+    updateContractNames: (newContractNames:ContractOption[]) => void;
+
+    theme: string,
+    updateTheme: (args0:string) => void;
+
+    hideOptional: boolean
+    updateHideOptional: (args0: boolean) => void;
 }
 
 type logInProps = {
@@ -56,6 +68,7 @@ type logInProps = {
     defaultPicture: boolean,
     profilePictureFileId: string,
     profilePictureFileUrl: string,
+    theme: string,
 }
 
 // Export the hook, takes an arrow function that returns as object with each of the keys in our state
@@ -79,6 +92,10 @@ export const useAuthStore = create(
             invitesCount: 0,
             contractCardCompact: true,
             contractDetails: null,
+            logsCardCompact: true,
+            contractNames: null,
+            theme: "",
+            hideOptional: false,
             onboardingComplete: () => {
                 set((state) => {
                     return {
@@ -97,7 +114,7 @@ export const useAuthStore = create(
                     }
                 })
             },
-            logIn: ({userId, username, password, email, sessionID, defaultPicture, profilePictureFileId, profilePictureFileUrl}:logInProps) => {
+            logIn: ({userId, username, password, email, sessionID, defaultPicture, profilePictureFileId, profilePictureFileUrl, theme}:logInProps) => {
                 set((state) => {
                     return {
                         ...state,
@@ -114,6 +131,10 @@ export const useAuthStore = create(
                         invitesCount: 0,
                         contractCardCompact: true,
                         contractDetails: null,
+                        logsCardCompact: true,
+                        contractNames: null,
+                        theme: theme,
+                        hideOptional: false,
                     }
                 })
             },
@@ -132,6 +153,7 @@ export const useAuthStore = create(
                         profilePictureFileId: "",
                         profilePictureFileUrl: "",
                         invitesCount: 0,
+                        theme: "",
                     }
                 })
             },
@@ -211,7 +233,39 @@ export const useAuthStore = create(
                        contractDetails: newContract,
                     }
                 })
-            }
+            },
+            updateLogsCard(logsCardCompact:boolean) {
+                set((state) => {
+                    return {
+                        ...state,
+                       logsCardCompact: logsCardCompact,
+                    }
+                })
+            },
+            updateContractNames(newContractNames:ContractOption[]) {
+                set((state) => {
+                    return {
+                        ...state,
+                       contractNames: newContractNames,
+                    }
+                })
+            },
+            updateTheme(newTheme:string) {
+                set((state) => {
+                    return {
+                        ...state,
+                       theme: newTheme,
+                    }
+                })
+            },
+            updateHideOptional(hide:boolean) {
+                set((state) => {
+                    return {
+                        ...state,
+                       hideOptional: hide,
+                    }
+                })
+            },
         }),  
     // second argument is where we are storing it
     {

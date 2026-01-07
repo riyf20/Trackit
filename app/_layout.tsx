@@ -8,6 +8,7 @@ import 'react-native-reanimated';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { useAuthStore } from '@/utils/authStore';
 import { useThemeColor } from "@/hooks/use-theme-color";
+import { useEffect } from "react";
 
 export const unstable_settings = {
   anchor: '(tabs)',
@@ -15,11 +16,18 @@ export const unstable_settings = {
 
 export default function RootLayout() {
 
-  const colorScheme = useColorScheme();
+  const {loggedin, onboarding, contractDetails, theme, updateTheme} = useAuthStore();
 
-  const {loggedin, onboarding, contractDetails} = useAuthStore();
+  const deviceTheme = useThemeColor({}, 'text');
 
-  const theme = useThemeColor({}, 'text');
+  useEffect(() => {
+    if(deviceTheme === '#ECEDEE') {
+      updateTheme('dark')
+    } else {
+      updateTheme('light')
+    }
+  }, [deviceTheme])
+  
 
   return (
     <>
@@ -27,15 +35,16 @@ export default function RootLayout() {
       {/* Link to use Gluestack component library */}
       <GluestackUIProvider config={config}>
         
-        <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+        <ThemeProvider value={theme === 'dark' ? DarkTheme : DefaultTheme}>
 
           <Stack
             screenOptions={{
-              contentStyle: { backgroundColor: theme },
+              contentStyle: { backgroundColor: theme==='dark' ? 'black' : 'gray' },
             }}
           >
             
             <Stack.Protected guard={loggedin && !onboarding}>
+
               <Stack.Screen name="(tabs)" options={{ headerShown: false, title: "Home" }} />
 
               <Stack.Screen name="setting/details/accountInformation" options={{ headerShown: true,  title: 'Change Account Information', headerBackButtonDisplayMode:"minimal", headerTitleStyle: {fontSize: 20}  }} />
@@ -53,6 +62,8 @@ export default function RootLayout() {
               <Stack.Screen name="contracts/createContract" options={{ headerShown: true, title: 'New Contract', headerBackButtonDisplayMode:"minimal", headerTitleStyle: {fontSize: 20} }} />
               <Stack.Screen name="contracts/[id]" options={{ headerShown: true, title: contractDetails?.Habit_Name, headerBackButtonDisplayMode:"minimal", headerTitleStyle: {fontSize: 20} }} />
 
+              <Stack.Screen name="logs/createLog" options={{ headerShown: true, title: 'New Log', headerBackButtonDisplayMode:"minimal", headerTitleStyle: {fontSize: 20} }} />
+            
             </Stack.Protected>
             
             <Stack.Protected guard={!loggedin && onboarding}>

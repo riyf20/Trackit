@@ -1,11 +1,12 @@
 import React, { forwardRef, useImperativeHandle, useRef, useState } from 'react';
-import { BottomSheetModal, BottomSheetView, BottomSheetModalProvider, BottomSheetScrollView, BottomSheetTextInput} from '@gorhom/bottom-sheet';
-import {Dimensions, Text, View} from 'react-native'
+import { BottomSheetModal, BottomSheetView, BottomSheetModalProvider} from '@gorhom/bottom-sheet';
+import {Dimensions, View} from 'react-native'
 import { runOnJS, useAnimatedReaction, useSharedValue } from 'react-native-reanimated';
 import ImageUploader from './ImageUploader';
-import { useThemeColor } from '@/hooks/use-theme-color';
+import ImageUploaderLogs from './ImageUploaderLogs';
+import { useAuthStore } from '@/utils/authStore';
 
-const Bottom =  forwardRef<BottomSheetHandle, BottomProps>(({ parent, keyboard, altered, setAltered}, ref) => {
+const Bottom =  forwardRef<BottomSheetHandle, BottomProps>(({ parent, keyboard, altered, setAltered, backdrop, selectedItems, setSelectedItems, videoThumbnails, setVideoThumbnails}, ref) => {
   
   // Reference so it can connect to parent
   const bottomSheetModalRef = useRef<BottomSheetModal>(null);
@@ -18,17 +19,24 @@ const Bottom =  forwardRef<BottomSheetHandle, BottomProps>(({ parent, keyboard, 
     close: () => bottomSheetModalRef.current?.close(),
   }));
 
-  const points = ['80%'];
   const [dynamicHeight, setDynamicHeight] = useState(0);
-
+  
   // Closes sheet
   const closeBottom = () => {
     bottomSheetModalRef.current?.close();
+    if(parent==='createLogs') {
+      backdrop!(false)
+    }
   }
   
   // Stores window size
   const windowHeight = Dimensions.get('window').height;
-
+  
+  const points = 
+  windowHeight < 900 ? ['90%']
+  : windowHeight <= 800 || windowHeight >= 900 ? ['80%']
+  : windowHeight <= 700 || windowHeight >= 800 ? ['70%']
+  : ['60%']
   const animatedPosition = useSharedValue(0);
 
   // Listen for position changes | Found this speed/size to work the best
@@ -52,29 +60,29 @@ const Bottom =  forwardRef<BottomSheetHandle, BottomProps>(({ parent, keyboard, 
     }
   );
 
-  const theme = useThemeColor({}, 'text');
-  
+  const {theme} = useAuthStore()
+    
   return (
       <BottomSheetModalProvider>
         <BottomSheetModal
           ref={bottomSheetModalRef}
           snapPoints={points}
-          enablePanDownToClose={parent==='profile' ? true : false}
+          enablePanDownToClose={parent!=='createLogs' && true}
           enableContentPanningGesture={parent === 'profile' ? true : false}
           enableHandlePanningGesture={keyboard ? false : true}
           enableDynamicSizing={false}
           animatedPosition={animatedPosition}
           backgroundStyle={{
-            backgroundColor: `${theme==='#ECEDEE' ? `darkgrey` : `lightgrey`}`,
+            backgroundColor: `${theme==='dark' ? `darkgrey` : `lightgrey`}`,
           }}
           style={{
-            borderColor: `${theme==='#ECEDEE' ? `lightgrey` : `black`}`,
+            borderColor: `${theme==='dark' ? `lightgrey` : `black`}`,
             borderWidth: 2,
             borderRadius: 18,
             width: '100%',
           }}
           index={0} //starts at this index when opened
-          animateOnMount={parent==='profile' ? true : false}
+          animateOnMount={true}
           handleComponent={() => (
               // Style for Handle indicator
               <View style={{ alignItems: 'center', paddingVertical: 8 }}>
@@ -97,7 +105,11 @@ const Bottom =  forwardRef<BottomSheetHandle, BottomProps>(({ parent, keyboard, 
           {/* Shows context here */}
           <BottomSheetView className="flex-1 items-center p-4 bg-#[121C22] z-50">
 
-            <ImageUploader setClose={closeBottom} setAltered={setAltered}/>
+            {parent==='profile' ?
+              <ImageUploader setClose={closeBottom} setAltered={setAltered!}/>
+              :
+              <ImageUploaderLogs setClose={closeBottom} selectedPictures={selectedItems!} setSelectedPictures={setSelectedItems!} thumbnails={videoThumbnails!} setThumbnails={setVideoThumbnails!} />
+            }
             
           </BottomSheetView>
         </BottomSheetModal>

@@ -1,8 +1,7 @@
-import { View, Text } from 'react-native'
+import { View } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import { ThemedText } from '@/components/themed-text'
 import { ThemedView } from '@/components/themed-view'
-import { useThemeColor } from '@/hooks/use-theme-color';
 import { getUserById } from '@/services/appwriteDatabase';
 import { useAuthStore } from '@/utils/authStore';
 import UserCard from '@/components/UserCard';
@@ -10,9 +9,7 @@ import UserCard from '@/components/UserCard';
 // Allows users to view incoming friend invites
 const invites = () => {
 
-  const theme = useThemeColor({}, 'text');
-
-  const { userId } = useAuthStore();
+  const {theme, userId } = useAuthStore();
 
   // Hold list of user's invites
   const [usersInvites, setUserInvites] = useState([]);
@@ -42,7 +39,7 @@ const invites = () => {
         {/* Will show dynamic count */}
         <ThemedText type='settingSubheading' className='mt-[10px]'>Your Invites ({usersInvites.length})</ThemedText> 
 
-        <View className={` ${theme==='#ECEDEE' ? 'bg-white/20' : 'bg-black/30'} bg-gray-600 w-[90%] h-fit py-[25px] mt-[12px] rounded-3xl items-center`} >
+        <View className={` ${theme==='dark' ? 'bg-white/20' : 'bg-black/30'} bg-gray-600 w-[90%] h-fit py-[25px] mt-[12px] rounded-3xl items-center`} >
           {/* Shows list of invites if array is populated */}
           {usersInvites.length > 0 ? (
             usersInvites.map((userid: string, index) => (              
